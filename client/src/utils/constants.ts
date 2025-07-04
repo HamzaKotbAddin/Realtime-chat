@@ -1,0 +1,6 @@
+export const NEXTJS_URL = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:5000";
+
+export const AUTH_ROUTES = "/api/auth";
+export const AUTH_SIGNUP = `${AUTH_ROUTES}/signup`;
+export const AUTH_LOGIN = `${AUTH_ROUTES}/login`;
+export const AUTH_LOGOUT = `${AUTH_ROUTES}/logout`;
