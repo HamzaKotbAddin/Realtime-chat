@@ -7,11 +7,14 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { apiClient } from "@/lib/api-client";
 import { AUTH_LOGIN, AUTH_SIGNUP } from "@/utils/constants";
-
-const API_BASE = process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:5000";
+import { useRouter } from "next/navigation";
+import { useAppStore } from "@/store";
 
 export default function AuthForm() {
+  const navigator = useRouter();
+
   /* ---------------- state ---------------- */
+  const { setUserInfo } = useAppStore();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -79,6 +82,13 @@ export default function AuthForm() {
       });
       console.log("Signup response:", response.data);
       toast.success("Account created successfully");
+      if (response.status === 201) {
+        const user = response.data?.user;
+        setUserInfo(user);
+        console.log("User info set in store:", user);
+        const destination = !!user?.profileSetup ? "/chat" : "/profile";
+        navigator.push(destination);
+      }
     } catch (err: any) {
       const errorMsg =
         err.response?.data?.error || err.response?.data?.message || err.message;
@@ -90,10 +100,7 @@ export default function AuthForm() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim() || !password) {
-      toast.error("Email and password are required");
-      return;
-    }
+    if (!validateLogin()) return;
 
     try {
       setIsLoading(true);
@@ -102,6 +109,15 @@ export default function AuthForm() {
         password,
       });
       console.log("Login response:", response.data);
+      const user = response.data?.user;
+      if (!user || !user.id) {
+        throw new Error("Invalid user data received");
+      }
+      const destination = !!user.profileSetup ? "/chat" : "/profile";
+      console.log("Setting userInfo to Zustand:", user); // ✅ Debug log
+      setUserInfo(user); // <- log this value
+      console.log("User info set in store:", user);
+      navigator.push(destination);
       toast.success("Login successful");
     } catch (err: any) {
       const errorMsg =

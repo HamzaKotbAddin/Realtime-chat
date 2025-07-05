@@ -4,3 +4,5 @@ export const AUTH_ROUTES = "/api/auth";
 export const AUTH_SIGNUP = `${AUTH_ROUTES}/signup`;
 export const AUTH_LOGIN = `${AUTH_ROUTES}/login`;
 export const AUTH_LOGOUT = `${AUTH_ROUTES}/logout`;
+export const AUTH_PROFILE = `${AUTH_ROUTES}/profile`;
+export const GET_USER_INFO = `${AUTH_ROUTES}/user-info`;
