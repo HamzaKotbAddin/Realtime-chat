@@ -2,6 +2,7 @@ import { NextFunction , Request, Response } from "express";
 import User from "../models/user.model.ts";
 import jwt from "jsonwebtoken";
 import { compare } from "bcrypt";
+import { profile } from "console";
 
 
 const maxAge = 3 * 24 * 60 * 60 * 1000;
@@ -54,6 +55,7 @@ export const signUp = async (req: Request, res: Response, next: NextFunction): P
       id: user.id,
       username: user.username,
       email: user.email,
+      
 
       image: user.image,
       profileSetup: user.profileSetup
@@ -131,6 +133,8 @@ export const getUserInfo = async (req: Request, res: Response): Promise<any>  =>
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
+
+    console.log("User info fetched successfully:", user);
     res.status(200).json({
       user: {
         id: user.id,
@@ -138,13 +142,62 @@ export const getUserInfo = async (req: Request, res: Response): Promise<any>  =>
         email: user.email,
         image: user.image,
         profileSetup: user.profileSetup,
-        firstName: user.firstName,
-        lastName: user.lastName,
+        firstName: user.firstName || "",
+        lastName: user.lastName || "",
         color: user.color
       }
     });
   } catch (error) {
     console.error("Error fetching user info:", error);
+    res.status(500).json({ error: "Something went wrong. Please try again later." });
+  }
+};
+
+
+export const updateProfile = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { userId } = req;
+
+    const { firstName, lastName, color } = req.body;
+
+
+    if (!firstName && !lastName && !color) {
+      return res.status(400).json({
+        error: "At least one field (firstName, lastName, color) is required to update"
+      });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        $set: {
+          firstName,
+          lastName,
+          color,
+        },
+      },
+      { new: true, runValidators: true }
+    ).select("-password");
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json({
+      message: "Profile updated successfully",
+      user: {
+        id: updatedUser.id,
+        username: updatedUser.username,
+        email: updatedUser.email,
+        image: updatedUser.image,
+        profileSetup: updatedUser.profileSetup,
+        firstName: updatedUser.firstName,
+        lastName: updatedUser.lastName,
+        color: updatedUser.color
+      }
+    });
+  } catch (error) {
+    console.error("Error updating profile:", error);
     res.status(500).json({ error: "Something went wrong. Please try again later." });
   }
 };

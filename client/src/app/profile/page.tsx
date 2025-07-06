@@ -1,23 +1,7 @@
-"use client";
-import { useAppStore } from "@/store";
+import ProfileUI from "./profile-ui";
 
 const Profile = () => {
-  const { userInfo } = useAppStore();
-  return (
-    <div>
-      Profile
-      <div>
-        {userInfo ? (
-          <div>
-            <h2>{userInfo.username}</h2>
-            <p>{userInfo.email}</p>
-          </div>
-        ) : (
-          <p>No user information available</p>
-        )}
-      </div>
-    </div>
-  );
+  return <ProfileUI />;
 };
 
 export default Profile;

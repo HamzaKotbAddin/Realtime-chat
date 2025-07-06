@@ -6,3 +6,4 @@ export const AUTH_LOGIN = `${AUTH_ROUTES}/login`;
 export const AUTH_LOGOUT = `${AUTH_ROUTES}/logout`;
 export const AUTH_PROFILE = `${AUTH_ROUTES}/profile`;
 export const GET_USER_INFO = `${AUTH_ROUTES}/user-info`;
+export const UPDATED_USER_INFO = `${AUTH_ROUTES}/update-user-info`;

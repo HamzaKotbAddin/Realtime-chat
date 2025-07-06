@@ -26,6 +26,7 @@ export const useAppStore = create<AppState>()(
     {
       name: "app-store", // key for localStorage
       // optionally you can serialize/deserialize here or add partialize
+      
     }
   )
 );
