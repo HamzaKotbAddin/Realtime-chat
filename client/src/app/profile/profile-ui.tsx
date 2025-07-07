@@ -49,6 +49,7 @@ const ProfileUI = () => {
     console.log({ file });
     if (file) {
       const formdata = new FormData();
+      formdata.append("profile-image", file);
       try {
         const response = await apiClient.put(UPDATED_USER_IMAGE, formdata);
         console.log({ response });
