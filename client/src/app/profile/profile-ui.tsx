@@ -6,11 +6,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAppStore } from "@/store";
 import { IoArrowBack } from "react-icons/io5";
 import clsx from "clsx";
-import axios from "axios";
-import { UPDATED_USER_IMAGE, UPDATED_USER_INFO } from "@/utils/constants"; // Adjust the path accordingly
+import {
+  NEXTJS_URL,
+  REMOVED_USER_IMAGE,
+  UPDATED_USER_IMAGE,
+  UPDATED_USER_INFO,
+} from "@/utils/constants";
 import { toast } from "sonner";
 import { apiClient } from "@/lib/api-client";
-import { read } from "fs";
 
 const presetColors = [
   0xff5733, // Red-Orange
@@ -24,12 +27,15 @@ const ProfileUI = () => {
   const router = useRouter();
   const { userInfo, setUserInfo } = useAppStore();
 
+  const [imageError, setImageError] = useState(false);
+
   const [image, setImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [isImageHovered, setIsImageHovered] = useState(false);
-  const [selectedColor, setSelectedColor] = useState<number | undefined>(
-    userInfo?.color
+  const [imagePreview, setImagePreview] = useState<string | null>(
+    userInfo?.image || ""
   );
+  const [isImageHovered, setIsImageHovered] = useState(false);
+  const [selectedColor, setSelectedColor] = useState(userInfo?.color);
+
   // const [username, setUsername] = useState(userInfo?.username || "");
   const [firstName, setFirstName] = useState(userInfo?.firstName || "");
   const [lastName, setLastName] = useState(userInfo?.lastName || "");
@@ -41,8 +47,21 @@ const ProfileUI = () => {
       setFirstName(userInfo.firstName || "");
       setLastName(userInfo.lastName || "");
       setSelectedColor(userInfo.color);
+      setImagePreview(userInfo.image || null);
     }
   }, [userInfo]);
+
+  console.log({ userInfo: userInfo?.image });
+  const imageSrc = userInfo?.image?.startsWith("http")
+    ? userInfo.image
+    : `${NEXTJS_URL}/${userInfo?.image}`;
+
+  const colorHex = `#${(selectedColor ?? userInfo?.color ?? 0x666666)
+    .toString(16)
+    .padStart(6, "0")}`;
+
+  console.log({ imageSrc });
+  console.log({ colorHex });
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -98,6 +117,7 @@ const ProfileUI = () => {
       const response = await apiClient.put(UPDATED_USER_INFO, {
         firstName,
         lastName,
+        image: userInfo.image,
         color: selectedColor,
       });
 
@@ -138,13 +158,22 @@ const ProfileUI = () => {
     );
   }
 
-  const handleDeleteImage = () => {
-    setImage(null); // clear file state
-    setImagePreview(null); // remove preview
-    setUserInfo({
-      ...userInfo,
-      image: undefined, // remove existing image from userInfo (if any)
-    });
+  const handleDeleteImage = async () => {
+    try {
+      const response = await apiClient.delete(REMOVED_USER_IMAGE);
+
+      if (response.status === 200) {
+        setUserInfo({ ...userInfo, image: undefined });
+        toast.success("Image removed successfully");
+        setImagePreview(null);
+      }
+    } catch (err: any) {
+      if (err.response?.data?.error) {
+        toast.error(err.response?.data?.error);
+      } else {
+        toast.error(err.message);
+      }
+    }
   };
 
   return (
@@ -159,37 +188,23 @@ const ProfileUI = () => {
           {/* Avatar */}
           <div
             className="relative"
-            onMouseEnter={() => setIsImageHovered(true)}
-            onMouseLeave={() => setIsImageHovered(false)}
+            // onMouseEnter={() => setIsImageHovered(true)}
+            // onMouseLeave={() => setIsImageHovered(false)}
           >
             <div className="relative w-24 h-24 rounded-full overflow-hidden">
               <Avatar className="w-full h-full bg-gray-700 text-white rounded-full flex items-center justify-center text-4xl font-bold">
-                {imagePreview ? (
-                  <AvatarImage
-                    src={imagePreview}
-                    alt="Uploaded Avatar"
-                    className="object-cover w-full h-full"
-                  />
-                ) : userInfo.image ? (
-                  <AvatarImage
-                    src={userInfo.image}
-                    alt="User Avatar"
-                    className="object-cover w-full h-full"
-                  />
-                ) : (
-                  <div
-                    className="w-full h-full flex items-center justify-center rounded-full"
-                    style={{
-                      backgroundColor: `#${(selectedColor ?? 0x666666)
-                        .toString(16)
-                        .padStart(6, "0")}`,
-                    }}
-                  >
-                    {userInfo.username?.charAt(0).toUpperCase()}
-                  </div>
-                )}
+                <AvatarImage
+                  src={imageSrc}
+                  alt="avatar"
+                  className="object-cover w-full h-full"
+                />
+                <AvatarFallback
+                  className="w-full h-full flex items-center justify-center text-white font-bold text-4xl"
+                  style={{ backgroundColor: colorHex }}
+                >
+                  {userInfo.username?.charAt(0).toUpperCase()}
+                </AvatarFallback>
               </Avatar>
-
               <input
                 type="file"
                 accept="image/*"

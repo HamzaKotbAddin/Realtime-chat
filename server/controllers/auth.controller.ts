@@ -33,10 +33,16 @@ export const signUp = async (req: Request, res: Response, next: NextFunction): P
       return res.status(400).json({ message: `username, email and password are required` });
     }
 
-    const existingUser = await User.findOne({ email }).select("+password");
+    const existingEmail = await User.findOne({ email }).select("+password");
 
-    if (existingUser) {
+    if (existingEmail) {
       return res.status(400).json({ error: "Email already registered."  , message: "Email already registered." });
+    }
+
+    const existingUsername = await User.findOne({ username }).select("+password");
+
+    if (existingUsername) {
+      return res.status(400).json({ error: "Username already registered." , message: "Username already registered." });
     }
 
     const user = await User.create({
@@ -165,7 +171,7 @@ export const updateProfile = async (req: Request, res: Response): Promise<any> =
     const { firstName, lastName, color } = req.body;
 
 
-    if (!firstName && !lastName && !color) {
+    if (!firstName && !lastName && color === undefined) {
       return res.status(400).json({
         error: "At least one field (firstName, lastName, color) is required to update"
       });
@@ -175,14 +181,13 @@ export const updateProfile = async (req: Request, res: Response): Promise<any> =
       userId,
       {
         $set: {
-          firstName,
-          lastName,
-          color,
+          ...(firstName && { firstName }),
+          ...(lastName && { lastName }),
+          ...(color !== undefined && { color }),
         },
       },
       { new: true, runValidators: true }
-    ).select("-password");
-
+    );
     if (!updatedUser) {
       return res.status(404).json({ error: "User not found" });
     }
@@ -237,15 +242,23 @@ export const updateImage = async (req: Request , res: Response): Promise<any> =>
 export const removeImage = async (req: Request, res: Response): Promise<any> => {
   try {
     const { userId } = req;
-    const { image } = req.body;
+    const user = await User.findById(userId);
+  if(!user){
+   return res.status(404).json({error: "User not found"});
+  }
+if(user.image){
+  unlinkSync(user.image);
+}
 
-    const deletedImage = await User.findByIdAndUpdate(userId, { $set: { image: "" } }, { new: true });
-    if (!deletedImage) {
-      return res.status(404).json
+user.image = null
+await user.save();
+
+    res.status(200).json({ message: "Image removed successfully" });
+
     }
-    res.status(200).json({ message: "Image removed successfully", user: deletedImage });
-  } catch (error) {
+  catch (error) {
     console.error("Error removing image:", error);
     res.status(500).json({ error: "Something went wrong. Please try again later." });
+   
   }
 }
