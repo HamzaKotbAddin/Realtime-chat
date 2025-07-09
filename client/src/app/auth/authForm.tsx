@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { use, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
@@ -11,15 +11,34 @@ import { useRouter } from "next/navigation";
 import { useAppStore } from "@/store";
 
 export default function AuthForm() {
-  const navigator = useRouter();
+  const router = useRouter();
 
   /* ---------------- state ---------------- */
-  const { setUserInfo } = useAppStore();
+  const userInfo = useAppStore((state) => state.userInfo);
+  const setUserInfo = useAppStore((state) => state.setUserInfo);
+  const hasHydrated = useAppStore((state) => state.hasHydrated);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!hasHydrated) return;
+
+    if (userInfo) {
+      toast.error("You are already logged in.");
+      router.push("/profile");
+    }
+  }, [hasHydrated, userInfo, router]);
+
+  if (!hasHydrated) {
+    return <div>Loading...</div>;
+  }
+
+  if (userInfo) {
+    return null; // while redirecting
+  }
 
   /* -------------- validation ------------- */
   const validateSignup = () => {
@@ -87,7 +106,7 @@ export default function AuthForm() {
         setUserInfo(user);
         console.log("User info set in store:", user);
         const destination = !!user?.profileSetup ? "/chat" : "/profile";
-        navigator.push(destination);
+        router.push(destination);
       }
     } catch (err: any) {
       const errorMsg =
@@ -117,7 +136,7 @@ export default function AuthForm() {
       console.log("Setting userInfo to Zustand:", user); // ✅ Debug log
       setUserInfo(user); // <- log this value
       console.log("User info set in store:", user);
-      navigator.push(destination);
+      router.push(destination);
       toast.success("Login successful");
     } catch (err: any) {
       const errorMsg =

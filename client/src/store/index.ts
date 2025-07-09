@@ -1,20 +1,12 @@
+"use client";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-interface UserInfo {
-  id: string;
-  username: string;
-  email: string;
-  image?: string;
-  profileSetup?: boolean;
-  firstName?: string;
-  lastName?: string;
-  color?: number;
-}
-
 interface AppState {
-  userInfo?: UserInfo;
-  setUserInfo: (userInfo: UserInfo | undefined) => void;
+  userInfo: any;
+  setUserInfo: (userInfo: any) => void;
+  hasHydrated: boolean;
+  setHasHydrated: (val: boolean) => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -22,11 +14,15 @@ export const useAppStore = create<AppState>()(
     (set) => ({
       userInfo: undefined,
       setUserInfo: (userInfo) => set({ userInfo }),
+      hasHydrated: false,
+      setHasHydrated: (val) => set({ hasHydrated: val }),
     }),
     {
-      name: "app-store", // key for localStorage
-      // optionally you can serialize/deserialize here or add partialize
-      
+      name: "app-store",
+      // 💡 This gets called after Zustand rehydrates from localStorage
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     }
   )
 );
