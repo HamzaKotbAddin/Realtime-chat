@@ -1,13 +1,34 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { GrAttachment } from "react-icons/gr";
 import { IoSend } from "react-icons/io5";
 import { RiEmojiStickerLine } from "react-icons/ri";
+import EmojiPicker, { Theme } from "emoji-picker-react";
 
 const MessageBar = () => {
-  const [message, setMessage] = useState("");
+  const emojiRef = useRef<HTMLDivElement>(null);
+  const [message, setMessage] = useState<string>("");
+  const [isEmojiOpen, setIsEmojiOpen] = useState<boolean>(false);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        emojiRef.current &&
+        !emojiRef.current.contains(event.target as Node)
+      ) {
+        setIsEmojiOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const handleEmojiClick = async (emoji: any) => {
+    setMessage((prev) => prev + emoji.emoji);
+  };
   const handleSendMessage = async () => {
     console.log(message);
   };
@@ -28,9 +49,20 @@ const MessageBar = () => {
         >
           <GrAttachment className="text-2xl" />
         </button>
-        <button className="text-neutral-500 hover:text-white transition text-2xl focus:outline-none">
+        <button
+          className="text-neutral-500 hover:text-white transition text-2xl focus:outline-none"
+          onClick={() => setIsEmojiOpen(!isEmojiOpen)}
+        >
           <RiEmojiStickerLine />
         </button>
+        <div className="absolute bottom-25 right-5" ref={emojiRef}>
+          <EmojiPicker
+            theme={Theme.AUTO}
+            open={isEmojiOpen}
+            lazyLoadEmojis={true}
+            onEmojiClick={handleEmojiClick}
+          />
+        </div>
       </div>
       <button
         className="text-white hover:text-white transition rounded-md text-2xl focus:outline-none bg-purple-700 flex items-center justify-center p-4 hover:bg-purple-600 cursor-pointer"
