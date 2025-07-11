@@ -39,7 +39,6 @@ const userSchema = new mongoose.Schema({
   image: {
     type: String,
     required: false,
-    default: "https://www.gravatar.com/avatar/placeholder",
   },
   color: {
     type: Number,
@@ -55,6 +54,7 @@ const userSchema = new mongoose.Schema({
 
 userSchema.pre("save", async function hashPassword(next) {
 try {
+  if (!this.isModified("password")) return next()
     const salt = await genSalt(10);
     this.password = await hash(this.password, salt);
     next();

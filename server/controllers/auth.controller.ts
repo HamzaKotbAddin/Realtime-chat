@@ -97,8 +97,10 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
     }
 
 
+    console.log("Raw password:", password);
+    console.log("Stored hashed password:", user.password);
     const auth = await compare(password, user.password);
-    if (!auth) {
+    console.log("Password match result:", auth);    if (!auth) {
       return res.status(401).json({ error: "Password is incorrect" });
     }
 
@@ -131,6 +133,21 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
   }
 }
 
+
+export const logout = async (req: Request, res: Response): Promise<any> =>  {
+  
+  try {
+    res.clearCookie("jwt", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+    });
+    res.status(200).json({ message: "Logout successful" });
+  } catch (error) {
+    console.error("Error during logout:", error);
+    res.status(500).json({ error: "Something went wrong. Please try again later." });
+  }
+}
 
 export const getUserInfo = async (req: Request, res: Response): Promise<any>  =>  {
 
@@ -168,7 +185,7 @@ export const updateProfile = async (req: Request, res: Response): Promise<any> =
   try {
     const { userId } = req;
 
-    const { firstName, lastName, color } = req.body;
+    const { firstName, lastName, color, profileSetup  } = req.body;
 
 
     if (!firstName && !lastName && color === undefined) {
@@ -184,6 +201,8 @@ export const updateProfile = async (req: Request, res: Response): Promise<any> =
           ...(firstName && { firstName }),
           ...(lastName && { lastName }),
           ...(color !== undefined && { color }),
+          ...(profileSetup !== undefined && { profileSetup }),
+          
         },
       },
       { new: true, runValidators: true }

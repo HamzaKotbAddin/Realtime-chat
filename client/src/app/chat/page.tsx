@@ -9,7 +9,7 @@ export default function ChatPage() {
       <Loading />
       <ContactsContainer />
       {/* <EmptyChatContainer /> */}
-      <ChatContainer />
+      {/* <ChatContainer /> */}
     </div>
   );
 }

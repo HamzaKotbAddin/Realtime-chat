@@ -14,6 +14,7 @@ import {
 } from "@/utils/constants";
 import { toast } from "sonner";
 import { apiClient } from "@/lib/api-client";
+import { profile } from "console";
 
 const presetColors = [
   0xff5733, // Red-Orange
@@ -52,6 +53,7 @@ const ProfileUI = () => {
   }, [userInfo]);
 
   console.log({ userInfo: userInfo?.image });
+
   const imageSrc = userInfo?.image?.startsWith("http")
     ? userInfo.image
     : `${NEXTJS_URL}/${userInfo?.image}`;
@@ -119,6 +121,7 @@ const ProfileUI = () => {
         lastName,
         image: userInfo.image,
         color: selectedColor,
+        profileSetup: true,
       });
 
       if (response.status === 200) {
@@ -127,6 +130,7 @@ const ProfileUI = () => {
           ...userInfo,
           firstName,
           lastName,
+          profileSetup: true,
           color: selectedColor,
         });
       }
