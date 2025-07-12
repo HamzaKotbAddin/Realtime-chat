@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
 
 // Extend Express Request interface to include userId
-declare global {
+ declare global {
   namespace Express {
     interface Request {
       userId?: string;

@@ -16,13 +16,35 @@ import Lottie from "lottie-react";
 import { useState } from "react";
 import { FaPlus } from "react-icons/fa";
 import animationData from "@/assets/gradient.animation.json";
+import { apiClient } from "@/lib/api-client";
+import { SEARCH_CONTACT } from "@/utils/constants";
+import { ScrollArea } from "@radix-ui/react-scroll-area";
 
 const NewDM = () => {
   const [newChat, setNewChat] = useState<boolean>(false);
   const [searchContacts, setSearchContacts] = useState([]);
 
-  const searchContact = async (search: string) => {
-    console.log("search contact");
+  const searchContact = async (searchTerm: string) => {
+    try {
+      if (searchTerm.length > 0) {
+        const response = await apiClient.post(SEARCH_CONTACT, {
+          searchTerm,
+        });
+        console.log("Response data:", response.data);
+        if (response.status === 200 && response.data.contacts.length > 0) {
+          setSearchContacts(response.data.contacts);
+          console.log("Contacts set:", response.data.contacts);
+        } else {
+          setSearchContacts([]);
+          console.log("No contacts found, clearing list");
+        }
+      } else {
+        setSearchContacts([]);
+        console.log("Empty search term, clearing contacts");
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -53,6 +75,18 @@ const NewDM = () => {
               onChange={(e) => searchContact(e.target.value)}
             />
           </div>
+          <ScrollArea className="h-[250px]">
+            <div className="flex flex-col gap-5">
+              {searchContacts.map((contact: any, index: number) => {
+                return (
+                  <div
+                    key={index}
+                    className="flex gap-3 items-center curser-pointer "
+                  ></div>
+                );
+              })}
+            </div>
+          </ScrollArea>
           {searchContacts.length <= 0 && (
             <div>
               <div className="flex-1  flex flex-col justify-center items-center duration-1000 transition-all mt-10">

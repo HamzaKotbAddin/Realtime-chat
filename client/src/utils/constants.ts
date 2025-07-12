@@ -10,3 +10,8 @@ export const UPDATED_USER_INFO = `${AUTH_ROUTES}/update-user-info`;
 export const UPDATED_USER_IMAGE = `${AUTH_ROUTES}/update-user-image`;
 export const REMOVED_USER_IMAGE = `${AUTH_ROUTES}/remove-user-image`;
 
+
+
+export const CONTACTS_ROUTES = "/api/contacts";
+export const SEARCH_CONTACT = `${CONTACTS_ROUTES}/search`;
+

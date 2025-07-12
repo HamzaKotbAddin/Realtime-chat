@@ -5,6 +5,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { connectToDB } from "./config/database";
 import authRouter from "./routes/auth.routes.ts";
+import contactRouter from "./routes/contact.routes.ts";
 
 dotenv.config();
 
@@ -29,6 +30,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/auth", authRouter);
+app.use("/api/contacts", contactRouter);
 
 await connectToDB();
 
