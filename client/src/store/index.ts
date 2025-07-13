@@ -1,8 +1,16 @@
 "use client";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { createAuthSlice } from "./slice/auth.slice";
+import { createChatSlice } from "./slice/chat.slice";
 
 interface AppState {
+  selectedChatType: any;
+  selectedChatData: any;
+  selectChatMessages: any;
+  setSelectedChatType: (selectedChatType: any) => void;
+  setSelectedChatData: (selectedChatData: any) => void;
+  setSelectChatMessages: (selectChatMessages: any) => void;
   userInfo: any;
   setUserInfo: (userInfo: any) => void;
   hasHydrated: boolean;
@@ -11,15 +19,14 @@ interface AppState {
 
 export const useAppStore = create<AppState>()(
   persist(
-    (set) => ({
-      userInfo: undefined,
-      setUserInfo: (userInfo) => set({ userInfo }),
+    (set, get) => ({
+      ...createAuthSlice(set),
+      ...createChatSlice(set, get),
       hasHydrated: false,
       setHasHydrated: (val) => set({ hasHydrated: val }),
     }),
     {
       name: "app-store",
-      // 💡 This gets called after Zustand rehydrates from localStorage
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
       },

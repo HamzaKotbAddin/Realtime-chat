@@ -1,8 +1,12 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useAppStore } from "@/store";
+import { use } from "react";
 import { RiCloseFill } from "react-icons/ri";
 const ChatHeader = () => {
+  const closeChat = useAppStore((state) => state.closeChat);
+  const selectedChatData = useAppStore((state) => state.selectedChatData);
   return (
     <div className="h-[10vh] border-b-2 border-[#2f303b] flex items-center justify-between px-20">
       <div className="flex gap-5 items-center ">
@@ -14,6 +18,7 @@ const ChatHeader = () => {
             className="text-neutral-500 focus:border-none focus:outline-none
  duration-300 transition-all hover:text-white cursor-pointer
 "
+            onClick={closeChat}
           >
             <RiCloseFill className="text-3xl" />
           </button>

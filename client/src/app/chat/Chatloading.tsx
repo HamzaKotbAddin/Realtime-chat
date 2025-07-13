@@ -7,6 +7,7 @@ import { toast } from "sonner";
 const LoadingRedirect = () => {
   const userInfo = useAppStore((state) => state.userInfo);
   const hasHydrated = useAppStore((state) => state.hasHydrated);
+  const selectedChatType = useAppStore((state) => state.selectedChatType);
   const router = useRouter();
 
   const [hasRedirected, setHasRedirected] = useState(false);
