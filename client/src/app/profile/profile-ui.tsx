@@ -31,9 +31,8 @@ const ProfileUI = () => {
   const [imageError, setImageError] = useState(false);
 
   const [image, setImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(
-    userInfo?.image || ""
-  );
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+
   const [isImageHovered, setIsImageHovered] = useState(false);
   const [selectedColor, setSelectedColor] = useState(userInfo?.color);
 
@@ -48,7 +47,6 @@ const ProfileUI = () => {
       setFirstName(userInfo.firstName || "");
       setLastName(userInfo.lastName || "");
       setSelectedColor(userInfo.color);
-      setImagePreview(userInfo.image || null);
     }
   }, [userInfo]);
 
@@ -68,29 +66,34 @@ const ProfileUI = () => {
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     console.log({ file });
-    if (file) {
-      const formdata = new FormData();
-      formdata.append("profile-image", file);
-      try {
-        const response = await apiClient.put(UPDATED_USER_IMAGE, formdata);
-        console.log({ response });
 
-        if (response.status === 200 && response.data.image) {
-          toast.success("Image updated successfully");
-        }
-        const reader = new FileReader();
-        reader.onload = () => {
-          setImagePreview(reader.result as string);
-        };
-        reader.readAsDataURL(file);
-      } catch (err: any) {
-        toast.error(
-          err.response?.data?.error || err.message || "Error updating image"
-        );
-      } finally {
-        if (fileInputref.current) {
-          fileInputref.current.value = "";
-        }
+    if (!file) return;
+
+    // Show image preview immediately (before waiting for upload)
+    const reader = new FileReader();
+    reader.onload = () => {
+      setImagePreview(reader.result as string); // Show preview in UI
+    };
+    reader.readAsDataURL(file);
+
+    // Prepare and upload file
+    const formdata = new FormData();
+    formdata.append("profile-image", file);
+
+    try {
+      const response = await apiClient.put(UPDATED_USER_IMAGE, formdata);
+      console.log({ response });
+
+      if (response.status === 200 && response.data.image) {
+        toast.success("Image updated successfully");
+      }
+    } catch (err: any) {
+      toast.error(
+        err.response?.data?.error || err.message || "Error updating image"
+      );
+    } finally {
+      if (fileInputref.current) {
+        fileInputref.current.value = ""; // Reset file input so same image can be re-uploaded
       }
     }
   };
@@ -167,7 +170,7 @@ const ProfileUI = () => {
       const response = await apiClient.delete(REMOVED_USER_IMAGE);
 
       if (response.status === 200) {
-        setUserInfo({ ...userInfo, image: undefined });
+        setUserInfo({ ...userInfo, image: null });
         toast.success("Image removed successfully");
         setImagePreview(null);
       }
@@ -198,7 +201,7 @@ const ProfileUI = () => {
             <div className="relative w-24 h-24 rounded-full overflow-hidden">
               <Avatar className="w-full h-full bg-gray-700 text-white rounded-full flex items-center justify-center text-4xl font-bold">
                 <AvatarImage
-                  src={imageSrc}
+                  src={imagePreview || imageSrc}
                   alt="avatar"
                   className="object-cover w-full h-full"
                 />
