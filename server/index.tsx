@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import { connectToDB } from "./config/database";
 import authRouter from "./routes/auth.routes.ts";
 import contactRouter from "./routes/contact.routes.ts";
+import setupSocket from "./socket.ts";
 
 dotenv.config();
 
@@ -39,3 +40,5 @@ const server = app.listen(port, () => {
     `✅ Server is running at http://localhost:${port}, accepting requests from ${process.env.ORIGIN}`
   );
 });
+
+setupSocket(server);
