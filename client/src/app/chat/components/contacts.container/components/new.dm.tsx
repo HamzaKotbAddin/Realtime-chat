@@ -108,7 +108,7 @@ const NewDM = () => {
                       <AvatarImage
                         src={imageSrc}
                         alt="avatar"
-                        className="object-cover w-full h-full"
+                        className="object-cover w-full h-full rounded-full"
                       />
                       <AvatarFallback
                         className="w-full h-full flex items-center justify-center text-white font-bold text-lg"

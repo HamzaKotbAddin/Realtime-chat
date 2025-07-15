@@ -12,6 +12,9 @@ export const useSocket = () => useContext(SocketContext);
 export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   const socket = useRef<Socket | null>(null);
   const userInfo = useAppStore((state) => state.userInfo);
+  const selectedChatType = useAppStore((state) => state.selectedChatType);
+  const SelectedChatData = useAppStore((state) => state.selectedChatData);
+  const addMessage = useAppStore((state) => state.addMessage);
 
   useEffect(() => {
     if (!userInfo || !userInfo.id) {
@@ -36,6 +39,20 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
     socket.current.on("connect_error", (err) => {
       console.error("Socket connection error:", err);
     });
+
+    const handleReciveMessages = (message: any) => {
+      if (
+        selectedChatType !== undefined &&
+        (SelectedChatData.id === message.sender.id ||
+          SelectedChatData.id === message.recipient.id)
+      ) {
+        addMessage(message);
+        console.log("Received message:", message);
+      }
+      return;
+    };
+
+    socket.current.on("receiveMessages", handleReciveMessages);
 
     return () => {
       if (socket.current) {
