@@ -16,7 +16,8 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
     const token = req.cookies.jwt;
 
     if (!token) {
-        res.status(401).json({ error: "Unauthorized access" });
+     res.status(401).json({ error: "Unauthorized access" });
+     return;
     }
 
     try {
@@ -31,8 +32,7 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
     } catch (error) {
         console.error("Token verification error:", error);
          res.status(401).json({ error: "Invalid token" });
-         next();
-
+         return;
     }
 
 }

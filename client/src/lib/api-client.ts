@@ -4,5 +4,5 @@ import { NEXTJS_URL } from "@/utils/constants";
 
 export const apiClient = axios.create({
   baseURL: NEXTJS_URL,
-  withCredentials: true, // This is important for sending cookies with requests
+  withCredentials: true, 
 });

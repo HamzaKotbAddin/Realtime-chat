@@ -15,3 +15,6 @@ export const REMOVED_USER_IMAGE = `${AUTH_ROUTES}/remove-user-image`;
 export const CONTACTS_ROUTES = "/api/contacts";
 export const SEARCH_CONTACT = `${CONTACTS_ROUTES}/search`;
 
+
+export const MESSAGE_ROUTES = "/api/messages";
+export const GET_MESSAGES = `${MESSAGE_ROUTES}/get-messages`;

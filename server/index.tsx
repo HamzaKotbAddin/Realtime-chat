@@ -7,6 +7,7 @@ import { connectToDB } from "./config/database";
 import authRouter from "./routes/auth.routes.ts";
 import contactRouter from "./routes/contact.routes.ts";
 import setupSocket from "./socket.ts";
+import messageRouter from "./routes/message.routes.ts";
 
 dotenv.config();
 
@@ -32,6 +33,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/auth", authRouter);
 app.use("/api/contacts", contactRouter);
+app.use("/api/messages", messageRouter);
 
 await connectToDB();
 

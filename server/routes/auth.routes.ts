@@ -1,4 +1,4 @@
-import { Router, Request, Response, NextFunction } from "express";
+import { Router} from "express";
 import { signUp, login, getUserInfo, updateProfile, updateImage, removeImage, logout } from "../controllers/auth.controller.ts";
 import { verifyToken } from "../middlewares/auth.middleware.ts";
 import multer from "multer";
