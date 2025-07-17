@@ -39,10 +39,8 @@ const NewDM = () => {
         const response = await apiClient.post(SEARCH_CONTACT, {
           searchTerm,
         });
-        console.log("Response data:", response.data);
         if (response.status === 200 && response.data.contacts.length > 0) {
           setSearchContacts(response.data.contacts);
-          console.log("Contacts set:", response.data.contacts);
         } else {
           setSearchContacts([]);
           console.log("No contacts found, clearing list");

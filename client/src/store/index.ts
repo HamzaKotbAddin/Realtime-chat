@@ -5,6 +5,8 @@ import { createAuthSlice } from "./slice/auth.slice";
 import { createChatSlice } from "./slice/chat.slice";
 
 interface AppState {
+  directMessagesContact: any;
+  setDirectMessagesContact: any;
   addMessage: any;
   closeChat: any;
   selectedChatType: any;
