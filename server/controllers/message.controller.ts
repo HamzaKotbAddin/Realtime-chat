@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import Message from "../models/messages.model.ts";
+import { mkdirSync, renameSync } from "fs"
 
 
 export const getMessages = async (req: Request, res: Response): Promise<any> => {
@@ -34,3 +35,32 @@ export const getMessages = async (req: Request, res: Response): Promise<any> => 
         .json({ error: "Something went wrong. Please try again later." });
     }
   };
+
+
+
+
+  export const uploadFile = async (req: Request, res: Response): Promise<any> => {
+    try {
+      if(!req.file){
+    return res.status(400).json({ error: "file is required" });
+      }
+      const date = Date.now();
+    let fileDir = `uploads/files/${date}`;
+    let fileName = `${fileDir}/${req.file.originalname}`;
+
+    mkdirSync(fileDir, {recursive: true});
+
+    renameSync(req.file.path, fileName)
+
+    return res.status(200).json({ filePath : fileName });
+
+
+    } catch (error) {
+      console.error("❌ Error uploading file:", error);
+      return res
+        .status(500)
+        .json({ error: "Something went wrong. Please try again later." });
+      
+    }
+    
+  }

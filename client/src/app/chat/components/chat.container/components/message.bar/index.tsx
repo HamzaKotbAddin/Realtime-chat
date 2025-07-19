@@ -8,9 +8,12 @@ import EmojiPicker, { Theme } from "emoji-picker-react";
 import { useAppStore } from "@/store";
 import { useSocket } from "@/context/socketContext";
 import { toast } from "sonner";
+import { apiClient } from "@/lib/api-client";
+import { UPLOAD_FILE } from "@/utils/constants";
 
 const MessageBar = () => {
   const emojiRef = useRef<HTMLDivElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
   const [message, setMessage] = useState<string>("");
   const [isEmojiOpen, setIsEmojiOpen] = useState<boolean>(false);
   const selectedChatType = useAppStore((state) => state.selectedChatType);
@@ -81,6 +84,45 @@ const MessageBar = () => {
     }
   };
 
+  const handleAttachFile = () => {
+    if (fileRef.current) fileRef.current.click();
+  };
+
+  const handleAttachChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      const file = e.target.files?.[0];
+      console.log({ file });
+      if (!file) return;
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await apiClient.post(UPLOAD_FILE, formData);
+      if (response.status === 200 && response.data) {
+        if (selectedChatType === "contact") {
+          socket?.emit(
+            "sendMessage",
+            {
+              sender: userInfo.id,
+              content: undefined,
+              recipient: selectChatData._id,
+              messageType: "file",
+              fileUrl: response.data.filePath,
+              timeStamp: new Date(),
+            },
+            (response: { status: "ok" | "error"; error?: string }) => {
+              if (response.status === "error") {
+                console.error("Failed to send message:", response.error);
+              }
+            }
+          );
+        }
+      }
+    } catch (error) {
+      console.log({ error });
+    }
+  };
+
   return (
     <div className="h-[10vh] bg-[#1c1d25] flex justify-center items-center px-8 mb-6 gap-6 ">
       <div className="flex-1 flex bg-[#2a2b33] rounder-md items-center gap-5 pr-5">
@@ -95,9 +137,16 @@ const MessageBar = () => {
           className="text-neutral-500 focus:border-none focus:outline-none
          duration-300 transition-all hover:text-white cursor-pointer
         "
+          onClick={handleAttachFile}
         >
           <GrAttachment className="text-2xl" />
         </button>
+        <input
+          type="file"
+          ref={fileRef}
+          className="hidden"
+          onChange={handleAttachChange}
+        />
         <button
           className="text-neutral-500 hover:text-white transition text-2xl focus:outline-none"
           onClick={() => setIsEmojiOpen(!isEmojiOpen)}

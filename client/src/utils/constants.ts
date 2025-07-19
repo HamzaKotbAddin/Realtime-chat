@@ -19,3 +19,4 @@ export const Get_DM_CONTACTS = `${CONTACTS_ROUTES}/get-contacts-for-dm`;
 
 export const MESSAGE_ROUTES = "/api/messages";
 export const GET_MESSAGES = `${MESSAGE_ROUTES}/get-messages`;
+export const UPLOAD_FILE = `${MESSAGE_ROUTES}/upload-file`;
