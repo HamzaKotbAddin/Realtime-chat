@@ -19,6 +19,12 @@ const MessageBar = () => {
   const selectedChatType = useAppStore((state) => state.selectedChatType);
   const selectChatData = useAppStore((state) => state.selectedChatData);
   const userInfo = useAppStore((state) => state.userInfo);
+
+  const setIsUploading = useAppStore((state) => state.setIsUploading);
+  const setfileUploadProgress = useAppStore(
+    (state) => state.setfileUploadProgress
+  );
+
   const socket = useSocket();
 
   useEffect(() => {
@@ -91,13 +97,29 @@ const MessageBar = () => {
   const handleAttachChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     try {
       const file = e.target.files?.[0];
-      console.log({ file });
       if (!file) return;
 
       const formData = new FormData();
       formData.append("file", file);
 
-      const response = await apiClient.post(UPLOAD_FILE, formData);
+      setIsUploading(true);
+      setfileUploadProgress(0);
+
+      const response = await apiClient.post(UPLOAD_FILE, formData, {
+        onUploadProgress: (data) => {
+          if (!data.total) return;
+          const percentCompleted = Math.round((data.loaded * 100) / data.total);
+          console.log("Upload Progress:", percentCompleted, "%");
+          setfileUploadProgress(percentCompleted);
+
+          // CLOSE TAP AT 100%
+          if (percentCompleted === 100) {
+            console.log("Upload reached 100%, closing tap...");
+            setIsUploading(false);
+          }
+        },
+      });
+
       if (response.status === 200 && response.data) {
         if (selectedChatType === "contact") {
           socket?.emit(
@@ -111,6 +133,7 @@ const MessageBar = () => {
               timeStamp: new Date(),
             },
             (response: { status: "ok" | "error"; error?: string }) => {
+              console.log("Socket emit callback:", response);
               if (response.status === "error") {
                 console.error("Failed to send message:", response.error);
               }
@@ -118,8 +141,12 @@ const MessageBar = () => {
           );
         }
       }
+      setfileUploadProgress(0);
     } catch (error) {
-      console.log({ error });
+      console.error("Upload error:", error);
+    } finally {
+      setIsUploading(false);
+      e.target.value = "";
     }
   };
 

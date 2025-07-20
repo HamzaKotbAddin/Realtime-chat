@@ -5,6 +5,10 @@ import { createAuthSlice } from "./slice/auth.slice";
 import { createChatSlice } from "./slice/chat.slice";
 
 interface AppState {
+  fileDownloadProgress: any;
+  fileUploadProgress: any;
+  isDownloading: any;
+  isUploading: any;
   directMessagesContact: any;
   setDirectMessagesContact: any;
   addMessage: any;
@@ -15,6 +19,10 @@ interface AppState {
   setSelectedChatType: (selectedChatType: any) => void;
   setSelectedChatData: (selectedChatData: any) => void;
   setSelectChatMessages: (selectChatMessages: any) => void;
+  setIsDownloading: (isDownloading: any) => void;
+  setIsUploading: (isUploading: any) => void;
+  setfileDownloadProgress: (fileDownloadProgress: any) => void;
+  setfileUploadProgress: (fileUploadProgress: any ) => void;
   userInfo: any;
   setUserInfo: (userInfo: any) => void;
   hasHydrated: boolean;

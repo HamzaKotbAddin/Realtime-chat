@@ -111,7 +111,6 @@ export const getContactForDMList = async (req: Request, res: Response): Promise<
       { $sort: { lastMessageTime: -1 } }
     ]);
 
-    console.log("Aggregation result contacts:", contacts);
 
     res.json({ contacts });
   } catch (error) {
@@ -119,3 +118,20 @@ export const getContactForDMList = async (req: Request, res: Response): Promise<
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+
+
+export const getAllContecats = async (req: Request, res: Response) => {
+  try {
+const users = await User.find({_id:{$ne:req.userId}},"username firstName lastName _id email")
+
+const contacts = users.map((user) => ({
+  label: user.username ? `${user.username}` : user.email,
+}))
+return res.status(200).json({ contacts });
+  } catch (error) {
+
+    console.error({error})
+    return res.status(500).json({message : "internal server error"})
+  }
+}

@@ -26,6 +26,10 @@ const MessageContainer = () => {
   const setSelectChatMessages = useAppStore(
     (state) => state.setSelectChatMessages
   );
+  const setIsdownloading = useAppStore((state) => state.setIsDownloading);
+  const setfileDownloadProgress = useAppStore(
+    (state) => state.setfileDownloadProgress
+  );
 
   const getMessages = async () => {
     try {
@@ -54,8 +58,15 @@ const MessageContainer = () => {
   const handleDownloadFile = async (fileUrl: string) => {
     try {
       if (!fileUrl) return;
+      setIsdownloading(true);
+      setfileDownloadProgress(0);
       const response = await apiClient.get(`${NEXTJS_URL}/${fileUrl}`, {
         responseType: "blob",
+        onDownloadProgress(progressEvent) {
+          const { loaded, total } = progressEvent;
+          const percentCompleted = Math.round((loaded * 100) / (total ?? 1));
+          setfileDownloadProgress(percentCompleted);
+        },
       });
 
       const urlBlob = window.URL.createObjectURL(new Blob([response.data]));
@@ -66,7 +77,11 @@ const MessageContainer = () => {
       link.click();
       link.remove();
       window.URL.revokeObjectURL(urlBlob);
+      setIsdownloading(false);
+      setfileDownloadProgress(0);
     } catch (error) {
+      setIsdownloading(false);
+      setfileDownloadProgress(0);
       console.error("Error downloading file:", error);
     }
   };
