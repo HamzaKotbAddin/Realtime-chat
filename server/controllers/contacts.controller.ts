@@ -127,6 +127,7 @@ const users = await User.find({_id:{$ne:req.userId}},"username firstName lastNam
 
 const contacts = users.map((user) => ({
   label: user.username ? `${user.username}` : user.email,
+  value: user._id
 }))
 return res.status(200).json({ contacts });
 
