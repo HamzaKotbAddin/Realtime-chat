@@ -121,7 +121,7 @@ export const getContactForDMList = async (req: Request, res: Response): Promise<
 
 
 
-export const getAllContecats = async (req: Request, res: Response) => {
+export const getAllContecats = async (req: Request, res: Response): Promise<any> => {
   try {
 const users = await User.find({_id:{$ne:req.userId}},"username firstName lastName _id email")
 
@@ -129,6 +129,7 @@ const contacts = users.map((user) => ({
   label: user.username ? `${user.username}` : user.email,
 }))
 return res.status(200).json({ contacts });
+
   } catch (error) {
 
     console.error({error})
