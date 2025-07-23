@@ -1,3 +1,4 @@
+import { channel } from "diagnostics_channel";
 import { IoIosDownload } from "react-icons/io";
 
 export interface ChatSlice {
@@ -9,12 +10,17 @@ export interface ChatSlice {
   fileDownloadProgress: number;
   setIsUploading: boolean
   setIsDownloading: boolean
+  channels: any;
 setfileUploadProgress: number
 setfileDownloadProgress: number
+    selectChatMessages: any;
+
     setSelectedChatType: (type: any) => void;
     setSelectedChatData: (data: any) => void;
-    selectChatMessages: any;
+      setChannels: (channels: any) => void;
+
     setSelectChatMessages: (messages: any) => void;
+    addChannel: (channel: any) => void
     closeChat: () => void;
     addMessage: (message: any) => void
   }
@@ -26,10 +32,15 @@ export const createChatSlice = (set : any, get : any) => ({
     selectedChatData: undefined, 
     selectChatMessages: [],
      directMessagesContact: [], 
+
      isUploading : false,
      isDownloading: false,
      fileUploadProgress: 0,
      fileDownloadProgress: 0,
+
+     channels: [],
+     
+     setChannels: (channels: any) => set({ channels }),
      setIsUploading: (isUploading: boolean) => set({ isUploading }),
      setIsDownloading: (isDownloading: boolean) => set({isDownloading}),
       setfileUploadProgress: (fileUploadProgress: number) => set({ fileUploadProgress }),
@@ -38,6 +49,7 @@ export const createChatSlice = (set : any, get : any) => ({
     setSelectedChatType: (selectedChatType: any) => set({ selectedChatType }),
     setSelectedChatData: (selectedChatData: any) => set({ selectedChatData }),
     setSelectChatMessages: (selectChatMessages: any) => set({ selectChatMessages }),
+    addChannel: (channel: any) => set({ channels: [...get().channels, channel] }),
     closeChat: () => set({ selectedChatType: undefined, selectedChatData: undefined, selectChatMessages: [] }),
     setDirectMessagesContact: (directMessagesContact: any) => set({ directMessagesContact }),
     addMessage: (message: any) => {

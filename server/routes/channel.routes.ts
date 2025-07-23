@@ -1,9 +1,13 @@
 // routes/channelRoutes.js
-import express from "express";
-import { getChannels } from "../controllers/channel.controller.ts";
+import { Router } from "express";
+import { createChannel, getUserChannels } from "../controllers/channel.controller.ts";
+import { verifyToken } from "../middlewares/auth.middleware.ts";
 
-const router = express.Router();
+const channelRoutes = Router();
 
-router.get("/test-channels", getChannels);
+channelRoutes.post("/create-channel", verifyToken, createChannel);
+channelRoutes.get("/get-user-channels", verifyToken, getUserChannels);
 
-export default router;
+
+
+export default channelRoutes;

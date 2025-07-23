@@ -12,25 +12,23 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import Lottie from "lottie-react";
 import { useEffect, useState } from "react";
 import { FaPlus } from "react-icons/fa";
-import animationData from "@/assets/gradient.animation.json";
 import { apiClient } from "@/lib/api-client";
 import {
+  CREATE_CHANNEL,
   GET_ALL_CONTACTS,
   NEXTJS_URL,
-  SEARCH_CONTACT,
 } from "@/utils/constants";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAppStore } from "@/store";
 import { Button } from "@/components/ui/button";
 import { MultiSelect } from "@/components/multi-select";
+import { channel } from "process";
 
 const NewChannel = () => {
   const [newChat, setNewChat] = useState<boolean>(false);
-  const [searchContacts, setSearchContacts] = useState([]);
   const [allContacts, setAllContacts] = useState([]);
   const [selectedContact, setSelectedContact] = useState<string[]>([]);
   const [channelName, setChannelName] = useState<string>("");
@@ -38,6 +36,7 @@ const NewChannel = () => {
   const userInfo = useAppStore((state) => state.userInfo);
   const setSelectedChatData = useAppStore((state) => state.setSelectedChatData);
   const setSelectedChatType = useAppStore((state) => state.setSelectedChatType);
+  const addChannel = useAppStore((state) => state.addChannel);
 
   useEffect(() => {
     const getData = async () => {
@@ -54,7 +53,26 @@ const NewChannel = () => {
     getData();
   }, []);
 
-  const createNewChannel = async () => {};
+  const createNewChannel = async () => {
+    try {
+      console.log("Selected contacts:", selectedContact);
+      if (channelName.length > 0 && selectedContact.length > 0) {
+        const response = await apiClient.post(CREATE_CHANNEL, {
+          name: channelName,
+          members: selectedContact,
+        });
+        console.log("Channel creation response:", response.data);
+        if (response.status === 200) {
+          setChannelName("");
+          setSelectedContact([]);
+          setNewChat(false);
+          addChannel(response.data.channel);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const imageSrc = userInfo?.image?.startsWith("http")
     ? userInfo.image

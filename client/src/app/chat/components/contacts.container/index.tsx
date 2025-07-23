@@ -4,7 +4,7 @@ import ProfileInfo from "./components/profile.info";
 import NewDM from "./components/new.dm";
 import { useEffect } from "react";
 import { apiClient } from "@/lib/api-client";
-import { Get_DM_CONTACTS } from "@/utils/constants";
+import { Get_DM_CONTACTS, GET_USER_CHANNELS } from "@/utils/constants";
 import { useAppStore } from "@/store";
 import ContactList from "@/components/contact.list";
 import CreateChannel from "./components/create.channel";
@@ -17,6 +17,9 @@ const ContactsContainer = () => {
     (state) => state.directMessagesContact
   );
 
+  const Channels = useAppStore((state) => state.channels);
+  const setChannels = useAppStore((state) => state.setChannels);
+
   useEffect(() => {
     const getContacts = async () => {
       const response = await apiClient.get(Get_DM_CONTACTS);
@@ -26,7 +29,16 @@ const ContactsContainer = () => {
         setDirectMessagesContact(response.data.contacts);
       }
     };
+    const getChannels = async () => {
+      const response = await apiClient.get(GET_USER_CHANNELS);
+      console.log("Response data:", response.data);
+      console.log("Response status:", response.data.channels);
+      if (response.data.channels) {
+        setChannels(response.data.channels);
+      }
+    };
 
+    getChannels();
     getContacts();
   }, []);
   return (
@@ -47,6 +59,9 @@ const ContactsContainer = () => {
         <div className="flex items-center justify-between pr-10">
           <Title text="Channels" />
           <CreateChannel />
+        </div>
+        <div className="max-h-[38v] overflow-y-auto">
+          <ContactList contacts={Channels} isChannel={true} />
         </div>
       </div>
       <ProfileInfo />

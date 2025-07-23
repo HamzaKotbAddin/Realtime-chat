@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { useAppStore } from "@/store";
 import { NEXTJS_URL } from "@/utils/constants";
 import { AvatarImage } from "@radix-ui/react-avatar";
-import { use } from "react";
 import { RiCloseFill } from "react-icons/ri";
+
 const ChatHeader = () => {
   const closeChat = useAppStore((state) => state.closeChat);
   const selectedChatData = useAppStore((state) => state.selectedChatData);
@@ -15,6 +15,7 @@ const ChatHeader = () => {
   const imageSrc = selectedChatData?.image?.startsWith("http")
     ? selectedChatData.image
     : `${NEXTJS_URL}/${selectedChatData?.image}`;
+
   return (
     <div className="h-[10vh] border-b-2 border-[#2f303b] flex items-center justify-between px-20">
       <div className="flex gap-5 items-center w-full justify-between ">
@@ -27,21 +28,34 @@ const ChatHeader = () => {
                 className="object-cover w-full h-full"
               />
               <AvatarFallback
-                className="w-full h-full flex items-center justify-center text-white font-bold text-lg"
-                style={{ backgroundColor: selectedChatData.color || "#808080" }}
+                className={`w-full h-full flex items-center justify-center text-white font-bold text-lg`}
+                style={{
+                  backgroundColor: selectedChatData?.color
+                    ? `#${selectedChatData.color.toString(16)}`
+                    : "#808080",
+                }}
               >
-                {selectedChatData.username?.charAt(0).toUpperCase() || "?"}
+                {SelectedChatType === "channel"
+                  ? "#"
+                  : selectedChatData?.username?.charAt(0).toUpperCase() || "?"}
               </AvatarFallback>
             </Avatar>
           </div>
-          {(SelectedChatType === "contact" && selectedChatData?.username) ||
+
+          {SelectedChatType === "contact" && selectedChatData?.username}
+          {SelectedChatType === "channel" && (
+            <span className="font-semibold text-lg text-white">
+              {selectedChatData?.name || "Unnamed Channel"}
+            </span>
+          )}
+          {SelectedChatType !== "contact" &&
+            SelectedChatType !== "channel" &&
             selectedChatData?.email}
         </div>
+
         <div className="flex items-center justify-center gap-5 ">
           <button
-            className="text-neutral-500 focus:border-none focus:outline-none
- duration-300 transition-all hover:text-white cursor-pointer
-"
+            className="text-neutral-500 focus:border-none focus:outline-none duration-300 transition-all hover:text-white cursor-pointer"
             onClick={closeChat}
           >
             <RiCloseFill className="text-3xl" />
