@@ -2,6 +2,8 @@ import { Server as SocketIOServer, Socket  } from "socket.io";
 import { Server } from "http"
 
 import Message from "./models/messages.model.ts";
+import User from "./models/user.model.ts";
+import Channel from "./models/channel.model.ts";
 
 interface MessagePayload {
     sender: string; 
@@ -10,6 +12,8 @@ interface MessagePayload {
     fileUrl?: string;
     messageType: "text" | "file";
     timeStamp?: Date;
+    channelId: string;
+
   }
 
 const setupSocket = (server: Server) => {
@@ -55,6 +59,84 @@ const setupSocket = (server: Server) => {
     }
 
     }
+const sendChannelMessage = async (
+  message: MessagePayload,
+  callback: (response: { status: "ok" | "error"; error?: string }) => void
+) => {
+  try {
+    console.log("📨 Incoming message payload:", message);
+
+    const { channelId, sender, content, messageType, fileUrl } = message;
+
+    const createMessage = await Message.create({
+      channelId,
+      sender,
+      content,
+      messageType,
+      fileUrl,
+      recipient: null,
+      timeStamp: new Date(),
+    });
+
+    console.log("✅ Message created:", createMessage);
+
+    const messageData = await Message.findById(createMessage._id)
+      .populate("sender", "id email username image color")
+      .exec();
+
+    console.log("📄 Populated message data:", messageData);
+
+    await Channel.findByIdAndUpdate(
+      channelId,
+      { $push: { messages: createMessage._id } },
+      { new: true }
+    );
+
+    console.log(`🔗 Message added to channel ${channelId}`);
+
+    const channel = await Channel.findById(channelId).populate("members admins");
+
+    console.log("📡 Populated channel:", {
+      id: channel?._id,
+      members: channel?.members?.length,
+      admins: channel?.admins?.length,
+    });
+
+    const finalData = { ...messageData?.toJSON(), channelId: channel?._id };
+
+    if (channel && channel.members) {
+      channel.members.forEach((member: any) => {
+        const memberSocketID = userSocketMap.get(member._id.toString());
+        if (memberSocketID) {
+          console.log(`📤 Sending message to member [${member.username}] at socket ${memberSocketID}`);
+          io.to(memberSocketID).emit("receive-channel-message", finalData);
+        } else {
+          console.warn(`⚠️ No socket found for member [${member.username}]`);
+        }
+      });
+
+      channel.admins.forEach((admin: any) => {
+        const adminSocketID = userSocketMap.get(admin._id.toString());
+        if (adminSocketID) {
+          console.log(`📤 Sending message to admin [${admin.username}] at socket ${adminSocketID}`);
+          io.to(adminSocketID).emit("receive-channel-message", finalData);
+        } else {
+          console.warn(`⚠️ No socket found for admin [${admin.username}]`);
+        }
+      });
+    } else {
+      console.warn("⚠️ Channel or members not found");
+    }
+
+    console.log("✅ Message sending complete");
+
+    callback({ status: "ok" });
+  } catch (error) {
+    console.error("❌ Error in sendChannelMessage:", error);
+    callback({ status: "error", error: (error as Error).message });
+  }
+};
+
 
     io.on("connection", (socket: Socket) => {
 
@@ -70,6 +152,7 @@ const setupSocket = (server: Server) => {
             console.log(`User ID not provided or undefined. Received:`, userId);     
     }
     socket.on("sendMessage", sendMessage);
+    socket.on("send-channel-message", sendChannelMessage);
     socket.on("disconnect", () => disconnect(socket));
 
 });

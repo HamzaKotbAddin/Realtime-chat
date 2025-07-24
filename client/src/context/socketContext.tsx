@@ -2,6 +2,7 @@
 
 import { useAppStore } from "@/store";
 import { NEXTJS_URL } from "@/utils/constants";
+import { channel } from "diagnostics_channel";
 import { useContext, createContext, useRef, useEffect } from "react";
 import { io, Socket } from "socket.io-client";
 
@@ -43,8 +44,19 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
     const handleReciveMessages = (message: any) => {
       if (
         selectedChatType !== undefined &&
-        (SelectedChatData.id === message.sender.id ||
-          SelectedChatData.id === message.recipient.id)
+        (SelectedChatData._id === message.sender.id ||
+          SelectedChatData._id === message.recipient.id)
+      ) {
+        addMessage(message);
+        console.log("Received message:", message);
+      }
+      return;
+    };
+
+    const handeRecivedChannelMessage = (message: any) => {
+      if (
+        selectedChatType !== undefined &&
+        SelectedChatData._id === message.channelId
       ) {
         addMessage(message);
         console.log("Received message:", message);
@@ -53,6 +65,7 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     socket.current.on("receiveMessages", handleReciveMessages);
+    socket.current.on("receive-channel-message", handeRecivedChannelMessage);
 
     return () => {
       if (socket.current) {
@@ -60,7 +73,7 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
         socket.current.disconnect();
       }
     };
-  }, [userInfo?.id]); // ✅ react only when _id is ready
+  }, [userInfo?.id, selectedChatType, SelectedChatData]);
 
   return (
     <SocketContext.Provider value={socket.current}>

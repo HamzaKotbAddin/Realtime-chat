@@ -23,16 +23,14 @@ const ContactsContainer = () => {
   useEffect(() => {
     const getContacts = async () => {
       const response = await apiClient.get(Get_DM_CONTACTS);
-      console.log("Response data:", response.data);
-      console.log("Response status:", response.data.contacts);
+
       if (response.data.contacts) {
         setDirectMessagesContact(response.data.contacts);
       }
     };
     const getChannels = async () => {
       const response = await apiClient.get(GET_USER_CHANNELS);
-      console.log("Response data:", response.data);
-      console.log("Response status:", response.data.channels);
+
       if (response.data.channels) {
         setChannels(response.data.channels);
       }

@@ -87,7 +87,26 @@ const MessageBar = () => {
           }
         }
       );
+    } else if (selectedChatType === "channel") {
+      socket.emit(
+        "send-channel-message",
+        {
+          sender: userInfo.id,
+          content: message,
+          channelId: selectChatData._id,
+          messageType: "text",
+          fileUrl: undefined,
+          timeStamp: new Date(),
+        },
+        (response: { status: "ok" | "error"; error?: string }) => {
+          if (response.status === "error") {
+            console.error("Failed to send message:", response.error);
+          }
+        }
+      );
     }
+
+    setMessage("");
   };
 
   const handleAttachFile = () => {
@@ -139,6 +158,15 @@ const MessageBar = () => {
               }
             }
           );
+        } else if (selectedChatType === "channel") {
+          socket?.emit("send-channel-message", {
+            sender: userInfo.id,
+            content: undefined,
+            channelId: selectChatData._id,
+            messageType: "file",
+            fileUrl: response.data.filePath,
+            timeStamp: new Date(),
+          });
         }
       }
       setfileUploadProgress(0);

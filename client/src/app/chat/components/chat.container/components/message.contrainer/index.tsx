@@ -10,6 +10,7 @@ import { GET_MESSAGES, NEXTJS_URL } from "@/utils/constants";
 import { MdFolderZip } from "react-icons/md";
 import { IoMdArrowRoundDown, IoMdClose } from "react-icons/io";
 import Image from "next/image";
+import { AvatarFallback, Avatar, AvatarImage } from "@/components/ui/avatar";
 
 // Extend dayjs
 dayjs.extend(relativeTime);
@@ -46,13 +47,15 @@ const MessageContainer = () => {
 
   useEffect(() => {
     if (selectChatData._id && selectedChatType === "contact") {
+      console.log("🔄 Fetching messages for chat ID:", selectChatData._id);
       getMessages();
     }
   }, [selectedChatType, selectChatData, setSelectChatMessages]);
 
   useEffect(() => {
-    if (scrollRef.current)
+    if (scrollRef.current) {
       scrollRef.current.scrollIntoView({ behavior: "smooth" });
+    }
   }, [selectChatMessages]);
 
   const handleDownloadFile = async (fileUrl: string) => {
@@ -93,7 +96,8 @@ const MessageContainer = () => {
   };
 
   const renderDMMessages = (message: any) => {
-    const isSender = message.sender === userInfo?.id;
+    const isSender = message.sender._id === userInfo?.id;
+
     const bubbleAlignment = isSender ? "self-end" : "self-start";
     const bubbleColors = isSender
       ? "bg-gradient-to-r from-purple-600 to-purple-800 text-white"
@@ -114,6 +118,7 @@ const MessageContainer = () => {
                   alt="file"
                   height={300}
                   width={300}
+                  style={{ width: "auto", height: "auto" }}
                   className="rounded-lg cursor-pointer hover:opacity-80 transition"
                   onClick={() =>
                     setPreviewImage(`${NEXTJS_URL}/${message.fileUrl}`)
@@ -135,6 +140,45 @@ const MessageContainer = () => {
                 />
               </div>
             )}
+          </div>
+        )}
+
+        <div className="text-xs text-gray-300 mt-2 text-right">
+          {dayjs(message.timeStamp).format("LT")}
+        </div>
+      </div>
+    );
+  };
+
+  const renderChannelMessages = (message: any) => {
+    return (
+      <div
+        className={`mt-5 ${
+          message.sender.id !== userInfo?.id ? "self-end" : "self-start"
+        }`}
+      >
+        <div className="text-sm whitespace-pre-wrap">{message.content}</div>
+        {message.sender._id !== userInfo?.id && (
+          <div className="flex items-center justify-center gap-3">
+            <Avatar className="w-8 h-8 bg-gray-700 text-white rounded-full flex items-center justify-center text-4xl font-bold">
+              <AvatarImage
+                src={`${NEXTJS_URL}/${message?.sender?.image}`}
+                alt="avatar"
+                className="object-cover w-full h-full"
+              />
+              <AvatarFallback
+                className={`w-full h-full flex items-ce nter justify-center text-white font-bold text-lg`}
+                style={{
+                  backgroundColor: message?.sender?.color
+                    ? `#${message.sender.color.toString(16)}`
+                    : "#808080",
+                }}
+              >
+                {selectChatData === "channel"
+                  ? "#"
+                  : message?.sender?.username?.charAt(0).toUpperCase() || "?"}
+              </AvatarFallback>
+            </Avatar>
           </div>
         )}
 
@@ -169,6 +213,7 @@ const MessageContainer = () => {
             </div>
           )}
           {selectedChatType === "contact" && renderDMMessages(message)}
+          {selectedChatType === "channel" && renderChannelMessages(message)}
         </div>
       );
     });

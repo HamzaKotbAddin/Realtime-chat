@@ -6,7 +6,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
 import {
   Tooltip,
   TooltipContent,
@@ -20,12 +19,10 @@ import {
   GET_ALL_CONTACTS,
   NEXTJS_URL,
 } from "@/utils/constants";
-import { ScrollArea } from "@radix-ui/react-scroll-area";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
 import { useAppStore } from "@/store";
 import { Button } from "@/components/ui/button";
 import { MultiSelect } from "@/components/multi-select";
-import { channel } from "process";
 
 const NewChannel = () => {
   const [newChat, setNewChat] = useState<boolean>(false);
@@ -42,9 +39,7 @@ const NewChannel = () => {
     const getData = async () => {
       try {
         const response = await apiClient.get(GET_ALL_CONTACTS);
-        console.log("Response data:", response.data);
         setAllContacts(response.data.contacts);
-        console.log("Response status:", response.data.contacts);
       } catch (error) {
         console.log(error);
       }
@@ -55,13 +50,11 @@ const NewChannel = () => {
 
   const createNewChannel = async () => {
     try {
-      console.log("Selected contacts:", selectedContact);
       if (channelName.length > 0 && selectedContact.length > 0) {
         const response = await apiClient.post(CREATE_CHANNEL, {
           name: channelName,
           members: selectedContact,
         });
-        console.log("Channel creation response:", response.data);
         if (response.status === 200) {
           setChannelName("");
           setSelectedContact([]);
@@ -77,7 +70,6 @@ const NewChannel = () => {
   const imageSrc = userInfo?.image?.startsWith("http")
     ? userInfo.image
     : `${NEXTJS_URL}/${userInfo?.image}`;
-  console.log("MultiSelect options:", allContacts);
 
   return (
     <>

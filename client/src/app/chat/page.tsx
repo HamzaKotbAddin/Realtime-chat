@@ -13,8 +13,6 @@ export default function ChatPage() {
   const fileUploadProgress = useAppStore((state) => state.fileUploadProgress);
   const fileDownloadProgres = useAppStore((state) => state.fileUploadProgress);
 
-  console.log("Selected chat type:", selectedChatType);
-
   return (
     <div className="flex h-[100vh] text-white overflow-hidden">
       <Loading />
