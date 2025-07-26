@@ -6,7 +6,11 @@ import dayjs from "dayjs";
 import localizedFormat from "dayjs/plugin/localizedFormat";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { apiClient } from "@/lib/api-client";
-import { GET_MESSAGES, NEXTJS_URL } from "@/utils/constants";
+import {
+  GET_CHANNEL_MESSAGES,
+  GET_MESSAGES,
+  NEXTJS_URL,
+} from "@/utils/constants";
 import { MdFolderZip } from "react-icons/md";
 import { IoMdArrowRoundDown, IoMdClose } from "react-icons/io";
 import Image from "next/image";
@@ -32,23 +36,38 @@ const MessageContainer = () => {
     (state) => state.setfileDownloadProgress
   );
 
-  const getMessages = async () => {
-    try {
-      const res = await apiClient.post(GET_MESSAGES, {
-        id: selectChatData._id,
-      });
-      if (res.data?.messages) {
-        setSelectChatMessages(res.data.messages);
-      }
-    } catch (error) {
-      console.error("Error fetching messages:", error);
-    }
-  };
-
   useEffect(() => {
-    if (selectChatData._id && selectedChatType === "contact") {
+    const getMessages = async () => {
+      try {
+        const res = await apiClient.post(GET_MESSAGES, {
+          id: selectChatData._id,
+        });
+        if (res.data?.messages) {
+          setSelectChatMessages(res.data.messages);
+        }
+      } catch (error) {
+        console.error("Error fetching messages:", error);
+      }
+    };
+    const getChannelMessages = async () => {
+      try {
+        const res = await apiClient.get(
+          `${GET_CHANNEL_MESSAGES}/${selectChatData._id}`
+        );
+        if (res.data?.messages) {
+          setSelectChatMessages(res.data.messages);
+        }
+      } catch (error) {
+        console.error("Error fetching channel messages:", error);
+      }
+    };
+    if (selectedChatType === "contact") {
       console.log("🔄 Fetching messages for chat ID:", selectChatData._id);
       getMessages();
+    }
+    if (selectedChatType === "channel") {
+      console.log("🔄 Fetching messages for channel ID:", selectChatData._id);
+      getChannelMessages();
     }
   }, [selectedChatType, selectChatData, setSelectChatMessages]);
 

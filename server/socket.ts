@@ -12,7 +12,7 @@ interface MessagePayload {
     fileUrl?: string;
     messageType: "text" | "file";
     timeStamp?: Date;
-    channelId: string;
+    channelId?: string;
 
   }
 

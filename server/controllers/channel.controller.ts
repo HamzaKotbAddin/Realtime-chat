@@ -69,3 +69,23 @@ const  channels = await Channel.find({$or:[{admins:userId},{members:userId}]}).s
 
   }
 }
+
+
+export const getChannelMessages = async (req: Request, res : Response): Promise<any> => { 
+  try {
+
+    const { channelId } = req.params
+    const channel = await Channel.findById(channelId).populate({path:"messages",populate:{path:"sender",select:"id email username image color"}})
+    if (!channel) {
+    return res.status(404).json({ error: "Channel not found" });
+
+    }
+    const messages = channel.messages;
+    return res.status(200).json({ messages })
+
+  } catch (error) {
+  
+    console.error("Error getting channel messages:", error);
+    res.status(500).json({ error: "Something went wrong. Please try again later." });
+  }
+}
