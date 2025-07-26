@@ -39,12 +39,19 @@ app.use("/api/contacts", contactRouter);
 app.use("/api/messages", messageRouter);
 app.use("/api/channel", channelRoutes);
 
-await connectToDB();
+async function main() {
+  await connectToDB();
 
-const server = app.listen(port, () => {
-  console.log(
-    `✅ Server is running at http://localhost:${port}, accepting requests from ${process.env.ORIGIN}`
-  );
+  const server = app.listen(port, () => {
+    console.log(
+      `✅ Server is running at http://localhost:${port}, accepting requests from ${process.env.ORIGIN}`
+    );
+  });
+
+  setupSocket(server);
+}
+
+main().catch((error) => {
+  console.error("Error starting server:", error);
+  process.exit(1);
 });
-
-setupSocket(server);

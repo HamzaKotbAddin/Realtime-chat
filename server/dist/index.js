@@ -2,7 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import { connectToDB } from "./config/database";
+import { connectToDB } from "./config/database.js";
 import authRouter from "./routes/auth.routes";
 import contactRouter from "./routes/contact.routes";
 import setupSocket from "./socket";
@@ -28,8 +28,14 @@ app.use("/api/auth", authRouter);
 app.use("/api/contacts", contactRouter);
 app.use("/api/messages", messageRouter);
 app.use("/api/channel", channelRoutes);
-await connectToDB();
-const server = app.listen(port, () => {
-    console.log(`✅ Server is running at http://localhost:${port}, accepting requests from ${process.env.ORIGIN}`);
+async function main() {
+    await connectToDB();
+    const server = app.listen(port, () => {
+        console.log(`✅ Server is running at http://localhost:${port}, accepting requests from ${process.env.ORIGIN}`);
+    });
+    setupSocket(server);
+}
+main().catch((error) => {
+    console.error("Error starting server:", error);
+    process.exit(1);
 });
-setupSocket(server);

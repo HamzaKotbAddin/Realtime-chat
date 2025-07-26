@@ -1,13 +1,14 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "es2022",          
+    "module": "es2022",
     "outDir": "dist",
     "rootDir": ".",
-
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "noEmitOnError": false,   
+    "strict": false          
   },
   "include": ["**/*.ts"],
   "exclude": ["node_modules"]
