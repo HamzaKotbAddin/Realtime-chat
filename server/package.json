@@ -1,12 +1,13 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "main": "index.tsx",
+  "main": "index.ts",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.tsx",
-    "dev": "nodemon --watch . --ext ts,tsx,json --exec tsx index.tsx"
+    "dev": "nodemon --watch . --ext ts,ts,json --exec ts index.ts",
+    "build": "tsc",
+    "start": "node dist/index.ts"
   },
   "keywords": [],
   "author": "",
