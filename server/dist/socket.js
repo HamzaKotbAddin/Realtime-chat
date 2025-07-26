@@ -1,6 +1,6 @@
 import { Server as SocketIOServer } from "socket.io";
-import Message from "./models/messages.model";
-import Channel from "./models/channel.model";
+import Message from "./models/messages.model.ts";
+import Channel from "./models/channel.model.ts";
 const setupSocket = (server) => {
   const io = new SocketIOServer(server, {
     cors: {

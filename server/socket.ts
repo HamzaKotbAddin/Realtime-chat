@@ -1,9 +1,9 @@
 import { Server as SocketIOServer, Socket  } from "socket.io";
 import { Server } from "http"
 
-import Message from "./models/messages.model.ts";
-import User from "./models/user.model.ts";
-import Channel from "./models/channel.model.ts";
+import Message from "./models/messages.model";
+import User from "./models/user.model";
+import Channel from "./models/channel.model";
 
 interface MessagePayload {
     sender: string; 
