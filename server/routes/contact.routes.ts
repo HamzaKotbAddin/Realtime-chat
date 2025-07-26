@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { getAllContecats, getContactForDMList, searchContact } from "../controllers/contacts.controller.ts";
-import { verifyToken } from "../middlewares/auth.middleware.ts";
+import { getAllContecats, getContactForDMList, searchContact } from "../controllers/contacts.controller";
+import { verifyToken } from "../middlewares/auth.middleware";
 
 const contactRouter = Router();
 

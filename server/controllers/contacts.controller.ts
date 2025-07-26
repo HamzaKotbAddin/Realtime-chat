@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express"
-import User from "../models/user.model.ts"
+import User from "../models/user.model"
 import mongoose from "mongoose";
-import Message from "../models/messages.model.ts";
+import Message from "../models/messages.model";
 
 
 export const searchContact = async (req: Request, res: Response, next: NextFunction): Promise<any> => {

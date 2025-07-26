@@ -1,6 +1,6 @@
-import Channel from "../models/channel.model.ts";
+import Channel from "../models/channel.model";
 import { Request, Response } from "express";
-import User from "../models/user.model.ts";
+import User from "../models/user.model";
 import mongoose from "mongoose";
 
 

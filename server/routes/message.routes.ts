@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { getMessages, uploadFile } from "../controllers/message.controller.ts";
-import { verifyToken } from "../middlewares/auth.middleware.ts";
+import { getMessages, uploadFile } from "../controllers/message.controller";
+import { verifyToken } from "../middlewares/auth.middleware";
 import multer from "multer";
 
 

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import Message from "../models/messages.model.ts";
+import Message from "../models/messages.model";
 import { mkdirSync, renameSync } from "fs"
 
 

@@ -1,7 +1,7 @@
 // routes/channelRoutes.js
 import { Router } from "express";
-import { createChannel, getChannelMessages, getUserChannels } from "../controllers/channel.controller.ts";
-import { verifyToken } from "../middlewares/auth.middleware.ts";
+import { createChannel, getChannelMessages, getUserChannels } from "../controllers/channel.controller";
+import { verifyToken } from "../middlewares/auth.middleware";
 
 const channelRoutes = Router();
 

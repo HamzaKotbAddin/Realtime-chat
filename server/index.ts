@@ -3,12 +3,12 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import { connectToDB } from "./config/database.ts";
-import authRouter from "./routes/auth.routes.ts";
-import contactRouter from "./routes/contact.routes.ts";
-import setupSocket from "./socket.ts";
-import messageRouter from "./routes/message.routes.ts";
-import channelRoutes from "./routes/channel.routes.ts";
+import { connectToDB } from "./config/database";
+import authRouter from "./routes/auth.routes";
+import contactRouter from "./routes/contact.routes";
+import setupSocket from "./socket";
+import messageRouter from "./routes/message.routes";
+import channelRoutes from "./routes/channel.routes";
 
 dotenv.config();
 
