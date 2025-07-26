@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import { connectToDB } from "./config/database";
+import { connectToDB } from "./config/database.ts";
 import authRouter from "./routes/auth.routes.ts";
 import contactRouter from "./routes/contact.routes.ts";
 import setupSocket from "./socket.ts";

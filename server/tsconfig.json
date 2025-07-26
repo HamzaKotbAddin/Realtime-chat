@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",              // Modern JavaScript target
+    "module": "ES2022",            // Node.js module system
+    "outDir": "dist",                // Output compiled JS here
+    "rootDir": ".",                  // Root of your source files
+    "strict": true,                  // Enable strict type checks
+    "esModuleInterop": true,         // For compatibility with CommonJS modules
+    "skipLibCheck": true,
+        "noEmit": true,
+
+        "allowImportingTsExtensions": true,
+            "moduleResolution": "node",
+
+             // Skip checking of declaration files for faster build
+  },
+  "include": ["**/*.ts"],            // Include all TS files
+  "exclude": ["node_modules"]        // Exclude dependencies folder
+}
