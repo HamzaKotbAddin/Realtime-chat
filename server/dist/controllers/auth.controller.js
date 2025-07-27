@@ -51,7 +51,7 @@ const signUp = async (req, res, next) => {
             httpOnly: true,
             maxAge: maxAge,
             secure: true,
-            sameSite: "strict", // Prevent CSRF attacks
+            sameSite: "none",
         });
         res.status(201).json({ message: "User created successfully", user: {
                 id: user.id,
@@ -93,7 +93,7 @@ const login = async (req, res, next) => {
             httpOnly: true,
             maxAge: maxAge,
             secure: true,
-            sameSite: "strict",
+            sameSite: "none",
         });
         res.status(200).json({
             message: "Login successful",
@@ -120,7 +120,7 @@ const logout = async (req, res) => {
         res.clearCookie("jwt", {
             httpOnly: true,
             secure: true,
-            sameSite: "strict",
+            sameSite: "none",
         });
         res.status(200).json({ message: "Logout successful" });
     }
