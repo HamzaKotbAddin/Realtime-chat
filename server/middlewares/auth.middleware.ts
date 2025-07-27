@@ -21,7 +21,7 @@ export const verifyToken =  (req: Request, res: Response, next: NextFunction) =>
     }
 
     try {
-        jwt.verify(token, process.env.JWT_Key as string, (error, payload) => {
+        jwt.verify(token, process.env.JWT_KEY as string, (error, payload) => {
             if (error) {
                 console.error("Token verification error:", error);
                 return res.status(401).json({ error: "Invalid token" });
