@@ -49,14 +49,22 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
 
     const handleReceiveMessages = (message: any) => {
       console.log("📩 Incoming 'receiveMessages' event:", message);
+      const senderId =
+        message.sender._id || message.sender.id || message.sender;
+      const recipientId =
+        message.recipient._id || message.recipient.id || message.recipient;
+      console.log("🧪 Checking IDs:");
+      console.log("SelectedChatData._id:", selectedChatData._id);
+      console.log("Sender ID:", senderId);
+      console.log("Recipient ID:", recipientId);
 
       if (
         selectedChatType === "contact" &&
-        (selectedChatData?._id === message.sender.id ||
-          selectedChatData?._id === message.recipient.id)
+        [senderId, recipientId].includes(selectedChatData._id)
       ) {
         console.log("✅ Matched current contact chat. Adding message.");
         addMessage(message);
+        console.log("✅ Message added to store:", message);
       } else {
         console.log("❌ Message not relevant to current contact chat.");
       }

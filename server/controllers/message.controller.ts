@@ -7,6 +7,11 @@ export const getMessages = async (req: Request, res: Response): Promise<any> => 
   try {
     const user1 = req.userId;
     const user2 = req.body.id;
+    
+    console.log("📥 Fetching messages between:", user1, "and", user2);
+
+    console.log("👉 req.body:", req.body);
+
 
     console.log("📨 Fetching messages between:", user1, "and", user2);
 
