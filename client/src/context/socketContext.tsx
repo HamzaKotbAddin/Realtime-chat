@@ -57,6 +57,13 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
       console.log("SelectedChatData._id:", selectedChatData._id);
       console.log("Sender ID:", senderId);
       console.log("Recipient ID:", recipientId);
+      console.log("📩 Incoming message:", message);
+      console.log("Sender keys:", Object.keys(message.sender));
+      console.log("Recipient keys:", Object.keys(message.recipient));
+      console.log("Sender._id:", message.sender._id);
+      console.log("Sender.id:", message.sender.id);
+      console.log("Recipient._id:", message.recipient._id);
+      console.log("Recipient.id:", message.recipient.id);
 
       if (
         selectedChatType === "contact" &&
