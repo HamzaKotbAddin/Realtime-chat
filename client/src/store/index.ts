@@ -5,6 +5,9 @@ import { createAuthSlice } from "./slice/auth.slice";
 import { createChatSlice } from "./slice/chat.slice";
 
 interface AppState {
+  setChannels: any;
+  channels: any;
+  addChannel: any;
   fileDownloadProgress: any;
   fileUploadProgress: any;
   isDownloading: any;

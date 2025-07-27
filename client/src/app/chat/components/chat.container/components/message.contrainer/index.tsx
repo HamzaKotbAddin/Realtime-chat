@@ -186,7 +186,7 @@ const MessageContainer = () => {
                 className="object-cover w-full h-full"
               />
               <AvatarFallback
-                className={`w-full h-full flex items-ce nter justify-center text-white font-bold text-lg`}
+                className={`w-full h-full flex items-center justify-center text-white font-bold text-lg`}
                 style={{
                   backgroundColor: message?.sender?.color
                     ? `#${message.sender.color.toString(16)}`

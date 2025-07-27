@@ -46,67 +46,96 @@ const MessageBar = () => {
     setMessage((prev) => prev + emoji.emoji);
   };
   const handleSendMessage = async () => {
+    console.log("💬 Send button clicked");
+    console.log("Current message:", message);
+    console.log("Socket instance:", socket);
+
     if (!socket) {
-      console.error("Socket is not connected");
+      console.error("❌ Socket is not connected");
       return;
     }
 
     if (!userInfo?.id) {
-      console.error("User info missing or user ID undefined");
+      console.error("❌ User info missing or user ID undefined");
       return;
     }
 
     if (!selectChatData?._id) {
-      console.error("Selected chat data missing or ID undefined");
+      console.error("❌ Selected chat data missing or ID undefined");
       return;
     }
 
     if (!message.trim()) {
-      toast.error("Cannot send empty message");
+      toast.error("⚠️ Cannot send empty message");
       return;
     }
 
     if (message.length > 1000) {
-      toast.error("Message is too long");
+      toast.error("⚠️ Message is too long");
       return;
     }
+
+    const payload = {
+      sender: userInfo.id,
+      content: message,
+      messageType: "text",
+      fileUrl: undefined,
+      timeStamp: new Date(),
+    };
+
     if (selectedChatType === "contact") {
+      const contactPayload = {
+        ...payload,
+        recipient: selectChatData._id,
+      };
+
+      console.log(
+        "📤 Emitting 'sendMessage' event with payload:",
+        contactPayload
+      );
+
       socket.emit(
         "sendMessage",
-        {
-          sender: userInfo.id,
-          content: message,
-          recipient: selectChatData._id,
-          messageType: "text",
-          fileUrl: undefined,
-          timeStamp: new Date(),
-        },
+        contactPayload,
         (response: { status: "ok" | "error"; error?: string }) => {
+          console.log("📥 Server response for 'sendMessage':", response);
           if (response.status === "error") {
-            console.error("Failed to send message:", response.error);
+            console.error("❌ Failed to send message:", response.error);
+          } else {
+            console.log("✅ Message sent successfully to contact");
           }
         }
       );
     } else if (selectedChatType === "channel") {
+      const channelPayload = {
+        ...payload,
+        channelId: selectChatData._id,
+      };
+
+      console.log(
+        "📤 Emitting 'send-channel-message' event with payload:",
+        channelPayload
+      );
+
       socket.emit(
         "send-channel-message",
-        {
-          sender: userInfo.id,
-          content: message,
-          channelId: selectChatData._id,
-          messageType: "text",
-          fileUrl: undefined,
-          timeStamp: new Date(),
-        },
+        channelPayload,
         (response: { status: "ok" | "error"; error?: string }) => {
+          console.log(
+            "📥 Server response for 'send-channel-message':",
+            response
+          );
           if (response.status === "error") {
-            console.error("Failed to send message:", response.error);
+            console.error("❌ Failed to send channel message:", response.error);
+          } else {
+            console.log("✅ Message sent successfully to channel");
           }
         }
       );
     }
 
     setMessage("");
+    console.log("🧹 Message input cleared");
   };
 
   const handleAttachFile = () => {

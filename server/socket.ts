@@ -39,6 +39,7 @@ const setupSocket = (server: Server) => {
 
     const sendMessage = async (message: MessagePayload, callback: (response: { status: "ok" | "error"; error?: string }) => void ) => {
         try {
+           console.log("📨 Private message received:", message);
         const senderSocketId = userSocketMap.get(message.sender);
         const recipientSocketId = userSocketMap.get(message.recipient);
 
@@ -54,7 +55,8 @@ const setupSocket = (server: Server) => {
         }
         callback({ status: "ok" });
     } catch (error) {
-        
+          console.error("❌ Error in sendMessage:", error);
+
         callback({ status: "error", error: (error as Error).message });
     }
 
@@ -146,6 +148,8 @@ const sendChannelMessage = async (
 
         if (userId && userId !== 'undefined') {
             userSocketMap.set(userId, socket.id);
+            console.log(`👥 Currently connected users: ${userSocketMap.size}`);
+
             console.log(`User ${userId} connected. Socket ID: ${socket.id}`);
 
         } else {
