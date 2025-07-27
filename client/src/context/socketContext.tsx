@@ -49,10 +49,6 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
 
     const handleReceiveMessages = (message: any) => {
       console.log("📩 Incoming 'receiveMessages' event:", message);
-      const senderId =
-        message.sender?._id || message.sender?.id || message?.sender;
-      const recipientId =
-        message.recipient._id || message.recipient.id || message.recipient;
       console.log("📩 Incoming message:", message);
       console.log(
         "Sender _id:",
@@ -72,13 +68,14 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
         "selectedChatData id:",
         selectedChatData?.id
       );
+
       if (
         selectedChatType === "contact" &&
-        [senderId, recipientId].includes(selectedChatData._id)
+        (selectedChatData?._id === message.sender.id ||
+          selectedChatData?._id === message.recipient.id)
       ) {
         console.log("✅ Matched current contact chat. Adding message.");
         addMessage(message);
-        console.log("✅ Message added to store:", message);
       } else {
         console.log("❌ Message not relevant to current contact chat.");
       }
@@ -86,10 +83,29 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
 
     const handleReceiveChannelMessages = (message: any) => {
       console.log("📩 Incoming 'receive-channel-message' event:", message);
+      console.log("📩 Incoming message:", message);
+      console.log(
+        "Sender _id:",
+        message.sender?._id,
+        "Sender id:",
+        message.sender?.id
+      );
+      console.log(
+        "Recipient _id:",
+        message.recipient?._id,
+        "Recipient id:",
+        message.recipient?.id
+      );
+      console.log(
+        "selectedChatData _id:",
+        selectedChatData?._id,
+        "selectedChatData id:",
+        selectedChatData?.id
+      );
 
       if (
         selectedChatType === "channel" &&
-        selectedChatData?._id === message.channelId
+        selectedChatData?._id === message?.channelId
       ) {
         console.log("✅ Matched current channel chat. Adding message.");
         addMessage(message);
