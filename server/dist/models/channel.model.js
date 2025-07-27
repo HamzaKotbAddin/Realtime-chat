@@ -1,5 +1,10 @@
-import mongoose from "mongoose";
-const channelSchema = new mongoose.Schema({
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const mongoose_1 = __importDefault(require("mongoose"));
+const channelSchema = new mongoose_1.default.Schema({
     name: {
         type: String,
         required: true,
@@ -8,24 +13,24 @@ const channelSchema = new mongoose.Schema({
     },
     members: [
         {
-            type: mongoose.Schema.Types.ObjectId,
+            type: mongoose_1.default.Schema.Types.ObjectId,
             ref: "User",
             required: true,
         },
     ],
     admins: [
         {
-            type: mongoose.Schema.Types.ObjectId,
+            type: mongoose_1.default.Schema.Types.ObjectId,
             ref: "User",
             required: true,
         },
     ],
     messages: [
         {
-            type: mongoose.Schema.Types.ObjectId,
+            type: mongoose_1.default.Schema.Types.ObjectId,
             ref: "Message",
         },
     ],
 }, { timestamps: true });
-const Channel = mongoose.model("Channel", channelSchema);
-export default Channel;
+const Channel = mongoose_1.default.model("Channel", channelSchema);
+exports.default = Channel;

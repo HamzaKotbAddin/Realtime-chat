@@ -1,6 +1,11 @@
-import mongoose from "mongoose";
-import { genSalt, hash } from "bcrypt";
-const userSchema = new mongoose.Schema({
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const mongoose_1 = __importDefault(require("mongoose"));
+const bcrypt_1 = require("bcrypt");
+const userSchema = new mongoose_1.default.Schema({
     username: {
         type: String,
         required: true,
@@ -52,8 +57,8 @@ userSchema.pre("save", async function hashPassword(next) {
     try {
         if (!this.isModified("password"))
             return next();
-        const salt = await genSalt(10);
-        this.password = await hash(this.password, salt);
+        const salt = await (0, bcrypt_1.genSalt)(10);
+        this.password = await (0, bcrypt_1.hash)(this.password, salt);
         next();
     }
     catch (error) {
@@ -61,5 +66,5 @@ userSchema.pre("save", async function hashPassword(next) {
         next(error);
     }
 });
-const User = mongoose.model("User", userSchema);
-export default User;
+const User = mongoose_1.default.model("User", userSchema);
+exports.default = User;

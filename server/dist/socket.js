@@ -1,8 +1,13 @@
-import { Server as SocketIOServer } from "socket.io";
-import Message from "./models/messages.model";
-import Channel from "./models/channel.model";
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const socket_io_1 = require("socket.io");
+const messages_model_1 = __importDefault(require("./models/messages.model"));
+const channel_model_1 = __importDefault(require("./models/channel.model"));
 const setupSocket = (server) => {
-    const io = new SocketIOServer(server, {
+    const io = new socket_io_1.Server(server, {
         cors: {
             origin: process.env.ORIGIN,
             methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
@@ -23,9 +28,9 @@ const setupSocket = (server) => {
         try {
             const senderSocketId = userSocketMap.get(message.sender);
             const recipientSocketId = userSocketMap.get(message.recipient);
-            const createMessage = await Message.create(message);
+            const createMessage = await messages_model_1.default.create(message);
             console.log(createMessage._id);
-            const messageData = await Message.findById(createMessage._id).populate("sender", "id email username image color").populate("recipient", "id email username image color");
+            const messageData = await messages_model_1.default.findById(createMessage._id).populate("sender", "id email username image color").populate("recipient", "id email username image color");
             if (senderSocketId) {
                 io.to(senderSocketId).emit("receiveMessages", messageData);
             }
@@ -42,7 +47,7 @@ const setupSocket = (server) => {
         try {
             console.log("📨 Incoming message payload:", message);
             const { channelId, sender, content, messageType, fileUrl } = message;
-            const createMessage = await Message.create({
+            const createMessage = await messages_model_1.default.create({
                 channelId,
                 sender,
                 content,
@@ -52,13 +57,13 @@ const setupSocket = (server) => {
                 timeStamp: new Date(),
             });
             console.log("✅ Message created:", createMessage);
-            const messageData = await Message.findById(createMessage._id)
+            const messageData = await messages_model_1.default.findById(createMessage._id)
                 .populate("sender", "id email username image color")
                 .exec();
             console.log("📄 Populated message data:", messageData);
-            await Channel.findByIdAndUpdate(channelId, { $push: { messages: createMessage._id } }, { new: true });
+            await channel_model_1.default.findByIdAndUpdate(channelId, { $push: { messages: createMessage._id } }, { new: true });
             console.log(`🔗 Message added to channel ${channelId}`);
-            const channel = await Channel.findById(channelId).populate("members admins");
+            const channel = await channel_model_1.default.findById(channelId).populate("members admins");
             console.log("📡 Populated channel:", {
                 id: channel?._id,
                 members: channel?.members?.length,
@@ -113,4 +118,4 @@ const setupSocket = (server) => {
     });
     return io; // Return the io instance for potential use elsewhere
 };
-export default setupSocket;
+exports.default = setupSocket;

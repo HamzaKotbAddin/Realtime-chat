@@ -1,8 +1,10 @@
-import { Router } from "express";
-import { getAllContecats, getContactForDMList, searchContact } from "../controllers/contacts.controller";
-import { verifyToken } from "../middlewares/auth.middleware";
-const contactRouter = Router();
-contactRouter.post("/search", verifyToken, searchContact);
-contactRouter.get("/get-contacts-for-dm", verifyToken, getContactForDMList);
-contactRouter.get("/get-all-contacts", verifyToken, getAllContecats);
-export default contactRouter;
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const contacts_controller_1 = require("../controllers/contacts.controller");
+const auth_middleware_1 = require("../middlewares/auth.middleware");
+const contactRouter = (0, express_1.Router)();
+contactRouter.post("/search", auth_middleware_1.verifyToken, contacts_controller_1.searchContact);
+contactRouter.get("/get-contacts-for-dm", auth_middleware_1.verifyToken, contacts_controller_1.getContactForDMList);
+contactRouter.get("/get-all-contacts", auth_middleware_1.verifyToken, contacts_controller_1.getAllContecats);
+exports.default = contactRouter;

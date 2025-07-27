@@ -1,11 +1,17 @@
-import Channel from "../models/channel.model";
-import User from "../models/user.model";
-import mongoose from "mongoose";
-export const createChannel = async (req, res) => {
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getChannelMessages = exports.getUserChannels = exports.createChannel = void 0;
+const channel_model_1 = __importDefault(require("../models/channel.model"));
+const user_model_1 = __importDefault(require("../models/user.model"));
+const mongoose_1 = __importDefault(require("mongoose"));
+const createChannel = async (req, res) => {
     try {
         const { name, members } = req.body;
         const userId = req.userId;
-        const admin = await User.findById(userId);
+        const admin = await user_model_1.default.findById(userId);
         if (!userId) {
             return res.status(401).json({ error: "Unauthorized user ID" });
         }
@@ -18,11 +24,11 @@ export const createChannel = async (req, res) => {
         if (members.length === 0) {
             return res.status(400).json({ error: "Members must be a non-empty" });
         }
-        const userVaildate = await User.find({ _id: { $in: members } });
+        const userVaildate = await user_model_1.default.find({ _id: { $in: members } });
         if (userVaildate.length !== members.length) {
             return res.status(404).json({ error: "some members are not vaild users" });
         }
-        const newChannel = new Channel({
+        const newChannel = new channel_model_1.default({
             name,
             members,
             admins: userId
@@ -35,10 +41,11 @@ export const createChannel = async (req, res) => {
         res.status(500).json({ error: "Something went wrong. Please try again later." });
     }
 };
-export const getUserChannels = async (req, res) => {
+exports.createChannel = createChannel;
+const getUserChannels = async (req, res) => {
     try {
-        const userId = new mongoose.Types.ObjectId(req.userId);
-        const channels = await Channel.find({ $or: [{ admins: userId }, { members: userId }] }).sort({ updatedAt: -1 });
+        const userId = new mongoose_1.default.Types.ObjectId(req.userId);
+        const channels = await channel_model_1.default.find({ $or: [{ admins: userId }, { members: userId }] }).sort({ updatedAt: -1 });
         for (const channel of channels) {
             console.log(channel.updatedAt);
         }
@@ -49,10 +56,11 @@ export const getUserChannels = async (req, res) => {
         res.status(500).json({ error: "Something went wrong. Please try again later." });
     }
 };
-export const getChannelMessages = async (req, res) => {
+exports.getUserChannels = getUserChannels;
+const getChannelMessages = async (req, res) => {
     try {
         const { channelId } = req.params;
-        const channel = await Channel.findById(channelId).populate({ path: "messages", populate: { path: "sender", select: "id email username image color" } });
+        const channel = await channel_model_1.default.findById(channelId).populate({ path: "messages", populate: { path: "sender", select: "id email username image color" } });
         if (!channel) {
             return res.status(404).json({ error: "Channel not found" });
         }
@@ -64,3 +72,4 @@ export const getChannelMessages = async (req, res) => {
         res.status(500).json({ error: "Something went wrong. Please try again later." });
     }
 };
+exports.getChannelMessages = getChannelMessages;

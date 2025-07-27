@@ -1,7 +1,13 @@
-import User from "../models/user.model";
-import mongoose from "mongoose";
-import Message from "../models/messages.model";
-export const searchContact = async (req, res, next) => {
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getAllContecats = exports.getContactForDMList = exports.searchContact = void 0;
+const user_model_1 = __importDefault(require("../models/user.model"));
+const mongoose_1 = __importDefault(require("mongoose"));
+const messages_model_1 = __importDefault(require("../models/messages.model"));
+const searchContact = async (req, res, next) => {
     try {
         const { searchTerm } = req.body;
         if (!searchTerm || searchTerm === undefined) {
@@ -9,7 +15,7 @@ export const searchContact = async (req, res, next) => {
         }
         const sanitzedSearchTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         const regex = new RegExp(sanitzedSearchTerm, 'i');
-        const contacts = await User.find({
+        const contacts = await user_model_1.default.find({
             $and: [
                 { _id: { $ne: req.userId } }, // Exclude current user
                 {
@@ -29,18 +35,19 @@ export const searchContact = async (req, res, next) => {
         res.status(500).json({ error: "Something went wrong. Please try again later." });
     }
 };
-export const getContactForDMList = async (req, res) => {
+exports.searchContact = searchContact;
+const getContactForDMList = async (req, res) => {
     try {
         const { userId } = req;
         if (!userId) {
             return res.status(401).json({ error: "Unauthorized" });
         }
-        const user = await User.findById(userId);
+        const user = await user_model_1.default.findById(userId);
         if (!user) {
             return res.status(404).json({ error: "User not found" });
         }
-        const currentUserId = new mongoose.Types.ObjectId(userId);
-        const contacts = await Message.aggregate([
+        const currentUserId = new mongoose_1.default.Types.ObjectId(userId);
+        const contacts = await messages_model_1.default.aggregate([
             {
                 $match: {
                     $and: [
@@ -100,9 +107,10 @@ export const getContactForDMList = async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 };
-export const getAllContecats = async (req, res) => {
+exports.getContactForDMList = getContactForDMList;
+const getAllContecats = async (req, res) => {
     try {
-        const users = await User.find({ _id: { $ne: req.userId } }, "username firstName lastName _id email");
+        const users = await user_model_1.default.find({ _id: { $ne: req.userId } }, "username firstName lastName _id email");
         const contacts = users.map((user) => ({
             label: user.username ? `${user.username}` : user.email,
             value: user._id
@@ -114,3 +122,4 @@ export const getAllContecats = async (req, res) => {
         return res.status(500).json({ message: "internal server error" });
     }
 };
+exports.getAllContecats = getAllContecats;

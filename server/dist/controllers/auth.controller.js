@@ -1,7 +1,13 @@
-import User from "../models/user.model";
-import jwt from "jsonwebtoken";
-import { compare } from "bcrypt";
-import { renameSync, unlinkSync } from "fs";
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.removeImage = exports.updateImage = exports.updateProfile = exports.getUserInfo = exports.logout = exports.login = exports.signUp = void 0;
+const user_model_1 = __importDefault(require("../models/user.model"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const bcrypt_1 = require("bcrypt");
+const fs_1 = require("fs");
 const maxAge = 3 * 24 * 60 * 60 * 1000;
 const maxAgeSeconds = maxAge / 1000;
 const createToken = (email, userId) => {
@@ -9,7 +15,7 @@ const createToken = (email, userId) => {
         if (!process.env.JWT_KEY) {
             throw new Error("JWT_KEY is not defined in environment variables");
         }
-        return jwt.sign({ email, userId }, process.env.JWT_KEY, {
+        return jsonwebtoken_1.default.sign({ email, userId }, process.env.JWT_KEY, {
             expiresIn: maxAgeSeconds
         });
     }
@@ -18,21 +24,21 @@ const createToken = (email, userId) => {
         throw error;
     }
 };
-export const signUp = async (req, res, next) => {
+const signUp = async (req, res, next) => {
     try {
         const { username, email, password } = req.body;
         if (!email || !password) {
             return res.status(400).json({ message: `username, email and password are required` });
         }
-        const existingEmail = await User.findOne({ email }).select("+password");
+        const existingEmail = await user_model_1.default.findOne({ email }).select("+password");
         if (existingEmail) {
             return res.status(400).json({ error: "Email already registered.", message: "Email already registered." });
         }
-        const existingUsername = await User.findOne({ username }).select("+password");
+        const existingUsername = await user_model_1.default.findOne({ username }).select("+password");
         if (existingUsername) {
             return res.status(400).json({ error: "Username already registered.", message: "Username already registered." });
         }
-        const user = await User.create({
+        const user = await user_model_1.default.create({
             username,
             email,
             password
@@ -61,7 +67,8 @@ export const signUp = async (req, res, next) => {
         next(error);
     }
 };
-export const login = async (req, res, next) => {
+exports.signUp = signUp;
+const login = async (req, res, next) => {
     try {
         const { email, password } = req.body;
         if (!email) {
@@ -70,13 +77,13 @@ export const login = async (req, res, next) => {
         if (!password) {
             return res.status(400).json({ error: "Password is required" });
         }
-        const user = await User.findOne({ email }).select("+password");
+        const user = await user_model_1.default.findOne({ email }).select("+password");
         if (!user) {
             return res.status(401).json({ error: "no email found" });
         }
         console.log("Raw password:", password);
         console.log("Stored hashed password:", user.password);
-        const auth = await compare(password, user.password);
+        const auth = await (0, bcrypt_1.compare)(password, user.password);
         console.log("Password match result:", auth);
         if (!auth) {
             return res.status(401).json({ error: "Password is incorrect" });
@@ -107,7 +114,8 @@ export const login = async (req, res, next) => {
         res.status(500).json({ error: "Something went wrong. Please try again later." });
     }
 };
-export const logout = async (req, res) => {
+exports.login = login;
+const logout = async (req, res) => {
     try {
         res.clearCookie("jwt", {
             httpOnly: true,
@@ -121,13 +129,14 @@ export const logout = async (req, res) => {
         res.status(500).json({ error: "Something went wrong. Please try again later." });
     }
 };
-export const getUserInfo = async (req, res) => {
+exports.logout = logout;
+const getUserInfo = async (req, res) => {
     try {
         const userId = req.userId;
         if (!userId) {
             return res.status(401).json({ error: "Unauthorized access" });
         }
-        const user = await User.findById(userId).select("-password");
+        const user = await user_model_1.default.findById(userId).select("-password");
         if (!user) {
             return res.status(404).json({ error: "User not found" });
         }
@@ -150,7 +159,8 @@ export const getUserInfo = async (req, res) => {
         res.status(500).json({ error: "Something went wrong. Please try again later." });
     }
 };
-export const updateProfile = async (req, res) => {
+exports.getUserInfo = getUserInfo;
+const updateProfile = async (req, res) => {
     try {
         const { userId } = req;
         const { firstName, lastName, color, profileSetup } = req.body;
@@ -159,7 +169,7 @@ export const updateProfile = async (req, res) => {
                 error: "At least one field (firstName, lastName, color) is required to update"
             });
         }
-        const updatedUser = await User.findByIdAndUpdate(userId, {
+        const updatedUser = await user_model_1.default.findByIdAndUpdate(userId, {
             $set: {
                 ...(firstName && { firstName }),
                 ...(lastName && { lastName }),
@@ -189,7 +199,8 @@ export const updateProfile = async (req, res) => {
         res.status(500).json({ error: "Something went wrong. Please try again later." });
     }
 };
-export const updateImage = async (req, res) => {
+exports.updateProfile = updateProfile;
+const updateImage = async (req, res) => {
     console.log(req.file);
     try {
         if (!req.file) {
@@ -197,8 +208,8 @@ export const updateImage = async (req, res) => {
         }
         const date = Date.now();
         let fileName = "uploads/profiles/" + date + "-" + req.file.originalname;
-        renameSync(req.file.path, fileName);
-        const updetedUser = await User.findByIdAndUpdate(req.userId, { $set: { image: fileName } }, { new: true, runValidators: true });
+        (0, fs_1.renameSync)(req.file.path, fileName);
+        const updetedUser = await user_model_1.default.findByIdAndUpdate(req.userId, { $set: { image: fileName } }, { new: true, runValidators: true });
         if (!updetedUser) {
             return res.status(404).json({ error: "Image not found" });
         }
@@ -209,15 +220,16 @@ export const updateImage = async (req, res) => {
         res.status(500).json({ error: "Something went wrong. Please try again later." });
     }
 };
-export const removeImage = async (req, res) => {
+exports.updateImage = updateImage;
+const removeImage = async (req, res) => {
     try {
         const { userId } = req;
-        const user = await User.findById(userId);
+        const user = await user_model_1.default.findById(userId);
         if (!user) {
             return res.status(404).json({ error: "User not found" });
         }
         if (user.image) {
-            unlinkSync(user.image);
+            (0, fs_1.unlinkSync)(user.image);
         }
         user.image = null;
         await user.save();
@@ -228,3 +240,4 @@ export const removeImage = async (req, res) => {
         res.status(500).json({ error: "Something went wrong. Please try again later." });
     }
 };
+exports.removeImage = removeImage;
