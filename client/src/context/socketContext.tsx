@@ -2,6 +2,7 @@
 
 import { useAppStore } from "@/store";
 import { NEXTJS_URL } from "@/utils/constants";
+import { channel } from "diagnostics_channel";
 import { useContext, createContext, useRef, useEffect } from "react";
 import { io, Socket } from "socket.io-client";
 
@@ -13,16 +14,16 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   const socket = useRef<Socket | null>(null);
   const userInfo = useAppStore((state) => state.userInfo);
   const selectedChatType = useAppStore((state) => state.selectedChatType);
-  const selectedChatData = useAppStore((state) => state.selectedChatData);
+  const SelectedChatData = useAppStore((state) => state.selectedChatData);
   const addMessage = useAppStore((state) => state.addMessage);
 
   useEffect(() => {
-    if (!userInfo?.id) {
-      console.log("❌ No user info found — skipping socket connection");
+    if (!userInfo || !userInfo.id) {
+      console.log("❌ No user info found");
       return;
     }
 
-    console.log("✅ Connecting to socket with userId:", userInfo.id);
+    console.log("✅ Connecting with userId:", userInfo.id);
 
     socket.current = io(NEXTJS_URL, {
       auth: {
@@ -33,83 +34,46 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
     });
 
     socket.current.on("connect", () => {
-      console.log(
-        "🔌 Connected to socket server, socket ID:",
-        socket.current?.id
-      );
+      console.log("Connected to socket server:", socket.current?.id);
     });
 
     socket.current.on("connect_error", (err) => {
-      console.error("❌ Socket connection error:", err.message);
+      console.error("Socket connection error:", err);
     });
 
-    socket.current.on("disconnect", (reason) => {
-      console.warn("⚠️ Disconnected from socket:", reason);
-    });
-
-    const handleReceiveMessages = (message: any) => {
-      const senderId = message.sender?._id || message.sender?.id;
-      const recipientId = message.recipient?._id || message.recipient?.id;
-      const selectedChatId = selectedChatData?._id || selectedChatData?.id;
-      console.log("📩 Incoming 'receiveMessages' event:", message);
-      console.log("📩 Incoming message:", message);
-      console.log(
-        "Sender _id:",
-        message.sender?._id,
-        "Sender id:",
-        message.sender?.id
-      );
-      console.log(
-        "Recipient _id:",
-        message.recipient?._id,
-        "Recipient id:",
-        message.recipient?.id
-      );
-      console.log(
-        "selectedChatData _id:",
-        selectedChatData?._id,
-        "selectedChatData id:",
-        selectedChatData?.id
-      );
-
+    const handleReciveMessages = (message: any) => {
       if (
-        selectedChatType === "contact" &&
-        (selectedChatId === senderId || selectedChatId === recipientId)
+        selectedChatType !== undefined &&
+        (SelectedChatData._id === message.sender.id ||
+          SelectedChatData._id === message.recipient.id)
       ) {
-        console.log("✅ Matched current contact chat. Adding message.");
         addMessage(message);
-      } else {
-        console.log("❌ Message not relevant to current contact chat.");
+        console.log("Received message:", message);
       }
+      return;
     };
 
-    const handleReceiveChannelMessages = (message: any) => {
+    const handeRecivedChannelMessage = (message: any) => {
       if (
-        selectedChatType === "channel" &&
-        selectedChatData?._id === message?.channelId
+        selectedChatType !== undefined &&
+        SelectedChatData._id === message.channelId
       ) {
-        console.log("✅ Matched current channel chat. Adding message.");
         addMessage(message);
-      } else {
-        console.log("❌ Message not relevant to current channel chat.");
+        console.log("Received message:", message);
       }
+      return;
     };
 
-    socket.current.on("receiveMessages", handleReceiveMessages);
-    socket.current.on("receive-channel-message", handleReceiveChannelMessages);
+    socket.current.on("receiveMessages", handleReciveMessages);
+    socket.current.on("receive-channel-message", handeRecivedChannelMessage);
 
     return () => {
       if (socket.current) {
-        console.log("🧹 Cleaning up socket listeners and disconnecting...");
-        socket.current.off("receiveMessages", handleReceiveMessages);
-        socket.current.off(
-          "receive-channel-message",
-          handleReceiveChannelMessages
-        );
+        console.log("Disconnecting socket...");
         socket.current.disconnect();
       }
     };
-  }, [userInfo?.id, selectedChatType, selectedChatData?._id]);
+  }, [userInfo?.id, selectedChatType, SelectedChatData]);
 
   return (
     <SocketContext.Provider value={socket.current}>
