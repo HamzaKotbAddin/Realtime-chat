@@ -50,21 +50,28 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
     const handleReceiveMessages = (message: any) => {
       console.log("📩 Incoming 'receiveMessages' event:", message);
       const senderId =
-        message.sender._id || message.sender.id || message.sender;
+        message.sender?._id || message.sender?.id || message?.sender;
       const recipientId =
         message.recipient._id || message.recipient.id || message.recipient;
-      console.log("🧪 Checking IDs:");
-      console.log("SelectedChatData._id:", selectedChatData._id);
-      console.log("Sender ID:", senderId);
-      console.log("Recipient ID:", recipientId);
       console.log("📩 Incoming message:", message);
-      console.log("Sender keys:", Object.keys(message.sender));
-      console.log("Recipient keys:", Object.keys(message.recipient));
-      console.log("Sender._id:", message.sender._id);
-      console.log("Sender.id:", message.sender.id);
-      console.log("Recipient._id:", message.recipient._id);
-      console.log("Recipient.id:", message.recipient.id);
-
+      console.log(
+        "Sender _id:",
+        message.sender?._id,
+        "Sender id:",
+        message.sender?.id
+      );
+      console.log(
+        "Recipient _id:",
+        message.recipient?._id,
+        "Recipient id:",
+        message.recipient?.id
+      );
+      console.log(
+        "selectedChatData _id:",
+        selectedChatData?._id,
+        "selectedChatData id:",
+        selectedChatData?.id
+      );
       if (
         selectedChatType === "contact" &&
         [senderId, recipientId].includes(selectedChatData._id)

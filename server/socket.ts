@@ -40,8 +40,8 @@ const setupSocket = (server: Server) => {
     const sendMessage = async (message: MessagePayload, callback: (response: { status: "ok" | "error"; error?: string }) => void ) => {
         try {
            console.log("📨 Private message received:", message);
-        const senderSocketId = userSocketMap.get(message.sender);
-        const recipientSocketId = userSocketMap.get(message.recipient);
+        const senderSocketId = userSocketMap.get(message?.sender);
+        const recipientSocketId = userSocketMap.get(message?.recipient);
 
         const createMessage = await Message.create(message);
         console.log(createMessage._id);
