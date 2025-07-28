@@ -27,8 +27,8 @@ export const getMessages = async (req: Request, res: Response): Promise<any> => 
       ],
     })
       .sort({ timeStamp: 1 })
-      .populate("sender", "id username email image color")
-      .populate("recipient", "id username email image color");
+      .populate("sender", "_id username email image color")
+      .populate("recipient", "_id username email image color");
 
     console.log(`✅ Found ${messages.length} messages`);
 

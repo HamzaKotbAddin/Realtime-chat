@@ -115,7 +115,7 @@ const MessageContainer = () => {
   };
 
   const renderDMMessages = (message: any) => {
-    const isSender = message.sender._id === userInfo?.id;
+    const isSender = message.sender?._id === userInfo?.id;
 
     const bubbleAlignment = isSender ? "self-end" : "self-start";
     const bubbleColors = isSender
@@ -173,11 +173,11 @@ const MessageContainer = () => {
     return (
       <div
         className={`mt-5 ${
-          message.sender.id !== userInfo?.id ? "self-end" : "self-start"
+          message.sender?.id !== userInfo?.id ? "self-end" : "self-start"
         }`}
       >
         <div className="text-sm whitespace-pre-wrap">{message.content}</div>
-        {message.sender._id !== userInfo?.id && (
+        {message.sender?._id !== userInfo?.id && (
           <div className="flex items-center justify-center gap-3">
             <Avatar className="w-8 h-8 bg-gray-700 text-white rounded-full flex items-center justify-center text-4xl font-bold">
               <AvatarImage
@@ -189,7 +189,7 @@ const MessageContainer = () => {
                 className={`w-full h-full flex items-center justify-center text-white font-bold text-lg`}
                 style={{
                   backgroundColor: message?.sender?.color
-                    ? `#${message.sender.color.toString(16)}`
+                    ? `#${message.sender?.color.toString(16)}`
                     : "#808080",
                 }}
               >
