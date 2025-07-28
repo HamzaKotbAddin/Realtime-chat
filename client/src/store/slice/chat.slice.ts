@@ -56,17 +56,12 @@ export const createChatSlice = (set : any, get : any) => ({
 
       const selectChatMessages = get().selectChatMessages;
       const selectedChatType = get().selectedChatType; 
-        console.log("Sender ID:", message.sender?._id);  // <— هنا
-        console.log("Recipient ID:", message.recipient?._id);
-                console.log("Sender ID:", message.sender?.id);  // <— هنا
-        console.log("Recipient ID:", message.recipient?.id);
-
-      
+    
     set({
       selectChatMessages: [...selectChatMessages, {
         ...message,
-        recipient: selectedChatType === "channel" ? message.recipient : message.recipient.id,
-        sender: selectedChatType === "channel" ? message.sender : message.sender.id
+        recipient: selectedChatType === "channel" ? message.recipient : message.recipient._id,
+        sender: selectedChatType === "channel" ? message.sender : message.sender._id
       }],
     })}
 });
