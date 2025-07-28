@@ -59,6 +59,8 @@ const MessageContainer = () => {
           console.log(
             `✅ Received ${res.data.messages.length} contact messages`
           );
+          console.log("Fetched messages:", res.data.messages);
+
           setSelectChatMessages(res.data.messages);
         }
       } catch (error) {
@@ -92,7 +94,7 @@ const MessageContainer = () => {
     if (selectedChatType === "channel") {
       getChannelMessages();
     }
-  }, [selectedChatType, selectChatData, setSelectChatMessages]);
+  }, [selectedChatType, selectChatData?._id, setSelectChatMessages]);
 
   useEffect(() => {
     console.log("🧹 useEffect: Messages changed, scrolling to bottom");
@@ -227,7 +229,7 @@ const MessageContainer = () => {
     return (
       <div
         className={`mt-5 ${
-          message.sender?.id !== userInfo?.id ? "self-end" : "self-start"
+          message.sender?._id !== userInfo?.id ? "self-end" : "self-start"
         }`}
       >
         <div className="text-sm whitespace-pre-wrap">{message.content}</div>
