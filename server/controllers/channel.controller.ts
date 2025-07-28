@@ -75,7 +75,7 @@ export const getChannelMessages = async (req: Request, res : Response): Promise<
   try {
 
     const { channelId } = req.params
-    const channel = await Channel.findById(channelId).populate({path:"messages",populate:{path:"sender",select:"id email username image color"}})
+    const channel = await Channel.findById(channelId).populate({path:"messages",populate:{path:"sender",select:"_id email username image color"}})
     if (!channel) {
     return res.status(404).json({ error: "Channel not found" });
 

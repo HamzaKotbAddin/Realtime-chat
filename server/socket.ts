@@ -45,7 +45,8 @@ const setupSocket = (server: Server) => {
 
         const createMessage = await Message.create(message);
         console.log(createMessage._id);
-        const messageData = await Message.findById(createMessage._id).populate("sender", "id email username image color").populate("recipient", "id email username image color");
+        const messageData = await Message.findById(createMessage._id).populate("sender", "_id email username image color").populate("recipient", "_id email username image color");
+console.log("📄 Populated message data:", messageData);
 
         if (senderSocketId) {
             io.to(senderSocketId).emit("receiveMessages", messageData);
@@ -83,7 +84,7 @@ const sendChannelMessage = async (
     console.log("✅ Message created:", createMessage);
 
     const messageData = await Message.findById(createMessage._id)
-      .populate("sender", "id email username image color")
+      .populate("sender", "_id email username image color")
       .exec();
 
     console.log("📄 Populated message data:", messageData);
