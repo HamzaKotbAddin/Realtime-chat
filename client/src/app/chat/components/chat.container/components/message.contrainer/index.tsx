@@ -37,19 +37,19 @@ const MessageContainer = () => {
   );
 
   useEffect(() => {
-    console.log(
-      "🔄 useEffect: Fetching messages for chat type:",
-      selectedChatType
-    );
+    console.log("🔄 [useEffect] Fetching messages triggered");
+    console.log("🟢 selectedChatType:", selectedChatType);
+    console.log("🟢 selectChatData._id:", selectChatData?._id);
+
     if (!selectChatData?._id) {
-      console.log("⚠️ No selectChatData._id found, abort fetch");
+      console.log("⚠️ [useEffect] No selectChatData._id found, abort fetch");
       return;
     }
 
     const getMessages = async () => {
       try {
         console.log(
-          "📨 Fetching contact messages for chat ID:",
+          "📨 [getMessages] Fetching contact messages for chat ID:",
           selectChatData._id
         );
         const res = await apiClient.post(GET_MESSAGES, {
@@ -57,21 +57,23 @@ const MessageContainer = () => {
         });
         if (res.data?.messages) {
           console.log(
-            `✅ Received ${res.data.messages.length} contact messages`
+            `✅ [getMessages] Received ${res.data.messages.length} messages`
           );
-          console.log("Fetched messages:", res.data.messages);
-
+          console.log("📥 [getMessages] Messages:", res.data.messages);
           setSelectChatMessages(res.data.messages);
+          console.log("🔄 [getMessages] setSelectChatMessages called");
+        } else {
+          console.log("⚠️ [getMessages] No messages received");
         }
       } catch (error) {
-        console.error("❌ Error fetching contact messages:", error);
+        console.error("❌ [getMessages] Error fetching messages:", error);
       }
     };
 
     const getChannelMessages = async () => {
       try {
         console.log(
-          "📨 Fetching channel messages for channel ID:",
+          "📨 [getChannelMessages] Fetching channel messages for channel ID:",
           selectChatData._id
         );
         const res = await apiClient.get(
@@ -79,27 +81,39 @@ const MessageContainer = () => {
         );
         if (res.data?.messages) {
           console.log(
-            `✅ Received ${res.data.messages.length} channel messages`
+            `✅ [getChannelMessages] Received ${res.data.messages.length} messages`
           );
+          console.log("📥 [getChannelMessages] Messages:", res.data.messages);
           setSelectChatMessages(res.data.messages);
+          console.log("🔄 [getChannelMessages] setSelectChatMessages called");
+        } else {
+          console.log("⚠️ [getChannelMessages] No messages received");
         }
       } catch (error) {
-        console.error("❌ Error fetching channel messages:", error);
+        console.error(
+          "❌ [getChannelMessages] Error fetching messages:",
+          error
+        );
       }
     };
 
     if (selectedChatType === "contact") {
       getMessages();
-    }
-    if (selectedChatType === "channel") {
+    } else if (selectedChatType === "channel") {
       getChannelMessages();
     }
   }, [selectedChatType, selectChatData?._id, setSelectChatMessages]);
 
   useEffect(() => {
-    console.log("🧹 useEffect: Messages changed, scrolling to bottom");
+    console.log(
+      "🧹 [useEffect] selectChatMessages changed, scrolling to bottom"
+    );
+    console.log("🧹 Current messages count:", selectChatMessages.length);
     if (scrollRef.current) {
       scrollRef.current.scrollIntoView({ behavior: "smooth" });
+      console.log("🧹 Scroll triggered to bottom");
+    } else {
+      console.log("⚠️ [useEffect] scrollRef.current is null");
     }
   }, [selectChatMessages]);
 
@@ -151,6 +165,7 @@ const MessageContainer = () => {
 
   const renderDMMessages = (message: any) => {
     const isSender = message.sender?._id === userInfo?.id;
+
     console.log("message.sender?._id", message.sender?._id);
     console.log("userInfo?.id", userInfo?.id);
     if (!message.sender) {
