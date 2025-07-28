@@ -37,31 +37,52 @@ const setupSocket = (server: Server) => {
         }
     }
 
-    const sendMessage = async (message: MessagePayload, callback: (response: { status: "ok" | "error"; error?: string }) => void ) => {
-        try {
-           console.log("📨 Private message received:", message);
-        const senderSocketId = userSocketMap.get(message?.sender);
-        const recipientSocketId = userSocketMap.get(message?.recipient);
+const sendMessage = async (
+  message: MessagePayload,
+  callback: (response: { status: "ok" | "error"; error?: string }) => void
+) => {
+  try {
+    console.log("📨 Private message received:", message);
+    console.log("📨 Sender ID:", message.sender);
+    console.log("📨 Recipient ID:", message.recipient);
 
-        const createMessage = await Message.create(message);
-        console.log(createMessage._id);
-        const messageData = await Message.findById(createMessage._id).populate("sender", "_id email username image color").populate("recipient", "_id email username image color");
-console.log("📄 Populated message data:", messageData);
+    const senderSocketId = userSocketMap.get(message?.sender);
+    const recipientSocketId = userSocketMap.get(message?.recipient);
 
-        if (senderSocketId) {
-            io.to(senderSocketId).emit("receiveMessages", messageData);
-        }
-        if (recipientSocketId) {
-            io.to(recipientSocketId).emit("receiveMessages", messageData);
-        }
-        callback({ status: "ok" });
-    } catch (error) {
-          console.error("❌ Error in sendMessage:", error);
+    console.log("📡 Sender socket ID:", senderSocketId);
+    console.log("📡 Recipient socket ID:", recipientSocketId);
 
-        callback({ status: "error", error: (error as Error).message });
+    const createMessage = await Message.create(message);
+    console.log("🆕 Created message in DB:", createMessage);
+
+    const messageData = await Message.findById(createMessage._id)
+      .populate("sender", "_id email username image color")
+      .populate("recipient", "_id email username image color");
+
+    console.log("📄 Populated message data:", messageData);
+
+    if (!messageData?.sender || !messageData?.recipient) {
+      console.warn("⚠️ Missing populated sender or recipient data");
     }
 
+    if (senderSocketId) {
+      io.to(senderSocketId).emit("receiveMessages", messageData);
+      console.log(`✅ Emitting to sender ${message.sender} on socket ${senderSocketId}`);
     }
+
+    if (recipientSocketId) {
+      io.to(recipientSocketId).emit("receiveMessages", messageData);
+      console.log(`✅ Emitting to recipient ${message.recipient} on socket ${recipientSocketId}`);
+    }
+
+    callback({ status: "ok" });
+    console.log("✅ Callback sent to client with status: ok");
+  } catch (error) {
+    console.error("❌ Error in sendMessage:", error);
+    callback({ status: "error", error: (error as Error).message });
+  }
+};
+
 const sendChannelMessage = async (
   message: MessagePayload,
   callback: (response: { status: "ok" | "error"; error?: string }) => void

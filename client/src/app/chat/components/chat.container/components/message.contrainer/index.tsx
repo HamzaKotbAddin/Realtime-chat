@@ -151,7 +151,6 @@ const MessageContainer = () => {
     const isSender = message.sender?._id === userInfo?.id;
     console.log("message.sender?._id", message.sender?._id);
     console.log("userInfo?.id", userInfo?.id);
-    console.log("message.sender?.id", message.sender?.id);
     if (!message.sender) {
       console.warn(
         "Received message without sender, fetching full message from server"
