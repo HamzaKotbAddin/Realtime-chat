@@ -42,6 +42,16 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
     });
 
     const handleReciveMessages = (message: any) => {
+      if (!message) return;
+      if (message.sender._id) {
+        message.sender.id = message.sender._id;
+      }
+      if (message.recipient._id) {
+        message.recipient.id = message.recipient._id;
+      }
+      console.log("🔥 NEW MESSAGE RECEIVED:", message);
+      console.log("🧾 Sender ID:", message.sender._id ?? message.sender.id);
+      console.log("🧾 Your User ID:", userInfo?.id);
       if (
         selectedChatType !== undefined &&
         (SelectedChatData._id === message.sender.id ||
