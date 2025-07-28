@@ -167,6 +167,7 @@ const MessageContainer = () => {
     const isSender = message.sender?._id === userInfo?.id;
 
     console.log("message.sender?._id", message.sender?._id);
+    console.log("message.sender?.id", message.sender?.id);
     console.log("userInfo?.id", userInfo?.id);
     if (!message.sender) {
       console.warn(
