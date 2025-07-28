@@ -164,16 +164,13 @@ const MessageContainer = () => {
   };
 
   const renderDMMessages = (message: any) => {
-    const isSender = message.sender?._id === userInfo?.id;
+    const senderId =
+      typeof message.sender === "string" ? message.sender : message.sender?._id;
 
-    console.log("message.sender?._id", message.sender?._id);
-    console.log("message.sender?.id", message.sender?.id);
-    console.log("userInfo?.id", userInfo?.id);
-    if (!message.sender) {
-      console.warn(
-        "Received message without sender, fetching full message from server"
-      );
-    }
+    const isSender = senderId === userInfo?.id;
+
+    console.log("senderId:", senderId);
+    console.log("userInfo?.id:", userInfo?.id);
     console.log("📦 Rendering DM message:", {
       content: message.content,
       sender: message.sender,
