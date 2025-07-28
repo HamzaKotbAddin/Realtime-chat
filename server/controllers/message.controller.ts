@@ -20,6 +20,7 @@ export const getMessages = async (req: Request, res: Response): Promise<any> => 
       return res.status(400).json({ error: "Both Users are required" });
     }
 
+
     const messages = await Message.find({
       $or: [
         { sender: user1, recipient: user2 },
@@ -31,6 +32,11 @@ export const getMessages = async (req: Request, res: Response): Promise<any> => 
       .populate("recipient", "_id username email image color");
 
     console.log(`✅ Found ${messages.length} messages`);
+    messages.forEach(msg => {
+  if (!msg.sender || !msg.recipient) {
+    console.warn("Found message with missing sender or recipient:", msg._id);
+  }
+});
 
     return res.status(200).json({ messages });
   } catch (error) {

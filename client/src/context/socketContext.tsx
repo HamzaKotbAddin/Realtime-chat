@@ -47,6 +47,12 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
 
     const handleReciveMessages = (message: any) => {
       console.log("📩 Received DM message:", message);
+      if (!message.sender) {
+        console.warn(
+          "Received incomplete message, fetching full message by ID",
+          message._id
+        );
+      }
       if (
         selectedChatType === "contact" &&
         SelectedChatData?._id &&
