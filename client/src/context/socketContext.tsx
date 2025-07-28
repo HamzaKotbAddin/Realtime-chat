@@ -42,6 +42,9 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
     });
 
     const handleReciveMessages = (message: any) => {
+      console.log("🔥message.sender._id:", message.sender._id);
+      console.log(" message.sender.id", message.sender.id);
+
       if (!message) return;
       if (message.sender._id) {
         message.sender.id = message.sender._id;
@@ -53,7 +56,7 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
       console.log("🧾 Sender ID:", message.sender._id ?? message.sender.id);
       console.log("🧾 Your User ID:", userInfo?.id);
       if (
-        selectedChatType !== undefined &&
+        selectedChatType !== "contact" &&
         (SelectedChatData._id === message.sender.id ||
           SelectedChatData._id === message.recipient.id)
       ) {
@@ -65,7 +68,7 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
 
     const handeRecivedChannelMessage = (message: any) => {
       if (
-        selectedChatType !== undefined &&
+        selectedChatType !== "channel" &&
         SelectedChatData._id === message.channelId
       ) {
         addMessage(message);
