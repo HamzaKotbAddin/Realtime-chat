@@ -2,7 +2,6 @@
 
 import { useAppStore } from "@/store";
 import { NEXTJS_URL } from "@/utils/constants";
-import { channel } from "diagnostics_channel";
 import { useContext, createContext, useRef, useEffect } from "react";
 import { io, Socket } from "socket.io-client";
 
@@ -18,8 +17,9 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   const addMessage = useAppStore((state) => state.addMessage);
 
   useEffect(() => {
+    console.log("🔄 useEffect triggered: Connecting socket");
     if (!userInfo || !userInfo.id) {
-      console.log("❌ No user info found");
+      console.log("❌ No user info found, aborting socket connection");
       return;
     }
 
@@ -34,47 +34,44 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
     });
 
     socket.current.on("connect", () => {
-      console.log("Connected to socket server:", socket.current?.id);
+      console.log("🟢 Connected to socket server:", socket.current?.id);
+    });
+
+    socket.current.on("disconnect", (reason) => {
+      console.log("🔴 Socket disconnected:", reason);
     });
 
     socket.current.on("connect_error", (err) => {
-      console.error("Socket connection error:", err);
+      console.error("⚠️ Socket connection error:", err);
     });
 
     const handleReciveMessages = (message: any) => {
-      console.log("🔥message.sender._id:", message.sender._id);
-      console.log(" message.sender.id", message.sender.id);
-
-      if (!message) return;
-      if (message.sender._id) {
-        message.sender.id = message.sender._id;
-      }
-      if (message.recipient._id) {
-        message.recipient.id = message.recipient._id;
-      }
-      console.log("🔥 NEW MESSAGE RECEIVED:", message);
-      console.log("🧾 Sender ID:", message.sender._id ?? message.sender.id);
-      console.log("🧾 Your User ID:", userInfo?.id);
+      console.log("📩 Received DM message:", message);
       if (
-        selectedChatType !== "contact" &&
-        (SelectedChatData._id === message.sender.id ||
-          SelectedChatData._id === message.recipient.id)
+        selectedChatType === "contact" &&
+        SelectedChatData?._id &&
+        (SelectedChatData._id === message.sender._id ||
+          SelectedChatData._id === message.recipient._id)
       ) {
+        console.log("✅ Message matches current contact chat, adding message");
         addMessage(message);
-        console.log("Received message:", message);
+      } else {
+        console.log("ℹ️ Message does not match current contact chat, ignoring");
       }
-      return;
     };
 
     const handeRecivedChannelMessage = (message: any) => {
+      console.log("📩 Received channel message:", message);
       if (
-        selectedChatType !== "channel" &&
+        selectedChatType === "channel" &&
+        SelectedChatData?._id &&
         SelectedChatData._id === message.channelId
       ) {
+        console.log("✅ Message matches current channel chat, adding message");
         addMessage(message);
-        console.log("Received message:", message);
+      } else {
+        console.log("ℹ️ Message does not match current channel chat, ignoring");
       }
-      return;
     };
 
     socket.current.on("receiveMessages", handleReciveMessages);
@@ -82,11 +79,11 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
 
     return () => {
       if (socket.current) {
-        console.log("Disconnecting socket...");
+        console.log("⚠️ Disconnecting socket...");
         socket.current.disconnect();
       }
     };
-  }, [userInfo?.id, selectedChatType, SelectedChatData]);
+  }, [userInfo?.id, selectedChatType, SelectedChatData, addMessage]);
 
   return (
     <SocketContext.Provider value={socket.current}>

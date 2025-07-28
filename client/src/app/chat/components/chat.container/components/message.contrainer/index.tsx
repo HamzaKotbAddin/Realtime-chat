@@ -37,41 +37,65 @@ const MessageContainer = () => {
   );
 
   useEffect(() => {
+    console.log(
+      "🔄 useEffect: Fetching messages for chat type:",
+      selectedChatType
+    );
+    if (!selectChatData?._id) {
+      console.log("⚠️ No selectChatData._id found, abort fetch");
+      return;
+    }
+
     const getMessages = async () => {
       try {
+        console.log(
+          "📨 Fetching contact messages for chat ID:",
+          selectChatData._id
+        );
         const res = await apiClient.post(GET_MESSAGES, {
           id: selectChatData._id,
         });
         if (res.data?.messages) {
+          console.log(
+            `✅ Received ${res.data.messages.length} contact messages`
+          );
           setSelectChatMessages(res.data.messages);
         }
       } catch (error) {
-        console.error("Error fetching messages:", error);
+        console.error("❌ Error fetching contact messages:", error);
       }
     };
+
     const getChannelMessages = async () => {
       try {
+        console.log(
+          "📨 Fetching channel messages for channel ID:",
+          selectChatData._id
+        );
         const res = await apiClient.get(
           `${GET_CHANNEL_MESSAGES}/${selectChatData._id}`
         );
         if (res.data?.messages) {
+          console.log(
+            `✅ Received ${res.data.messages.length} channel messages`
+          );
           setSelectChatMessages(res.data.messages);
         }
       } catch (error) {
-        console.error("Error fetching channel messages:", error);
+        console.error("❌ Error fetching channel messages:", error);
       }
     };
+
     if (selectedChatType === "contact") {
-      console.log("🔄 Fetching messages for chat ID:", selectChatData._id);
       getMessages();
     }
     if (selectedChatType === "channel") {
-      console.log("🔄 Fetching messages for channel ID:", selectChatData._id);
       getChannelMessages();
     }
   }, [selectedChatType, selectChatData, setSelectChatMessages]);
 
   useEffect(() => {
+    console.log("🧹 useEffect: Messages changed, scrolling to bottom");
     if (scrollRef.current) {
       scrollRef.current.scrollIntoView({ behavior: "smooth" });
     }
@@ -79,7 +103,11 @@ const MessageContainer = () => {
 
   const handleDownloadFile = async (fileUrl: string) => {
     try {
-      if (!fileUrl) return;
+      if (!fileUrl) {
+        console.log("⚠️ No file URL provided for download");
+        return;
+      }
+      console.log("⬇️ Starting file download:", fileUrl);
       setIsdownloading(true);
       setfileDownloadProgress(0);
       const response = await apiClient.get(`${NEXTJS_URL}/${fileUrl}`, {
@@ -88,6 +116,7 @@ const MessageContainer = () => {
           const { loaded, total } = progressEvent;
           const percentCompleted = Math.round((loaded * 100) / (total ?? 1));
           setfileDownloadProgress(percentCompleted);
+          console.log(`📊 Download progress: ${percentCompleted}%`);
         },
       });
 
@@ -99,23 +128,34 @@ const MessageContainer = () => {
       link.click();
       link.remove();
       window.URL.revokeObjectURL(urlBlob);
+      console.log("✅ File download completed:", fileUrl);
       setIsdownloading(false);
       setfileDownloadProgress(0);
     } catch (error) {
       setIsdownloading(false);
       setfileDownloadProgress(0);
-      console.error("Error downloading file:", error);
+      console.error("❌ Error downloading file:", error);
     }
   };
 
   const checkIfImage = (filePath: string) => {
-    return /\.(jpg|jpeg|png|gif|webp|svg|bmp|ico|tiff|jfif|heic|heif)$/i.test(
-      filePath
-    );
+    const isImage =
+      /\.(jpg|jpeg|png|gif|webp|svg|bmp|ico|tiff|jfif|heic|heif)$/i.test(
+        filePath
+      );
+    console.log(`🔍 checkIfImage for ${filePath}: ${isImage}`);
+    return isImage;
   };
 
   const renderDMMessages = (message: any) => {
     const isSender = message.sender?._id === userInfo?.id;
+
+    console.log("📦 Rendering DM message:", {
+      content: message.content,
+      sender: message.sender,
+      userInfo,
+      isSender,
+    });
 
     const bubbleAlignment = isSender ? "self-end" : "self-start";
     const bubbleColors = isSender
@@ -139,9 +179,10 @@ const MessageContainer = () => {
                   width={300}
                   style={{ width: "auto", height: "auto" }}
                   className="rounded-lg cursor-pointer hover:opacity-80 transition"
-                  onClick={() =>
-                    setPreviewImage(`${NEXTJS_URL}/${message.fileUrl}`)
-                  }
+                  onClick={() => {
+                    console.log("🖼️ Preview image clicked:", message.fileUrl);
+                    setPreviewImage(`${NEXTJS_URL}/${message.fileUrl}`);
+                  }}
                 />
               </div>
             ) : (
@@ -155,7 +196,13 @@ const MessageContainer = () => {
                 </span>
                 <IoMdArrowRoundDown
                   className="text-2xl hover:text-purple-300 cursor-pointer transition"
-                  onClick={() => handleDownloadFile(message.fileUrl)}
+                  onClick={() => {
+                    console.log(
+                      "⬇️ Download button clicked for:",
+                      message.fileUrl
+                    );
+                    handleDownloadFile(message.fileUrl);
+                  }}
                 />
               </div>
             )}
@@ -170,6 +217,7 @@ const MessageContainer = () => {
   };
 
   const renderChannelMessages = (message: any) => {
+    console.log("📦 Rendering channel message:", message);
     return (
       <div
         className={`mt-5 ${
@@ -212,12 +260,15 @@ const MessageContainer = () => {
     let lastDate: string | null = null;
 
     if (!selectChatMessages || selectChatMessages.length === 0) {
+      console.log("ℹ️ No messages to render");
       return (
         <div className="text-center text-gray-400 mt-10 italic">
           No messages yet. Start the conversation!
         </div>
       );
     }
+
+    console.log(`📝 Rendering ${selectChatMessages.length} messages`);
 
     return selectChatMessages.map((message: any, index: number) => {
       const messageDate = dayjs(message.timeStamp).format("YYYY-MM-DD");
@@ -246,7 +297,10 @@ const MessageContainer = () => {
       {previewImage && (
         <div
           className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center"
-          onClick={() => setPreviewImage(null)}
+          onClick={() => {
+            console.log("❌ Closing image preview");
+            setPreviewImage(null);
+          }}
         >
           <div className="relative" onClick={(e) => e.stopPropagation()}>
             <Image
@@ -258,7 +312,10 @@ const MessageContainer = () => {
             />
             <button
               className="absolute top-2 right-2 bg-black/60 text-white rounded-full p-2 hover:bg-black/80 cursor-pointer"
-              onClick={() => setPreviewImage(null)}
+              onClick={() => {
+                console.log("❌ Closing image preview via button");
+                setPreviewImage(null);
+              }}
             >
               <IoMdClose size={20} />
             </button>
