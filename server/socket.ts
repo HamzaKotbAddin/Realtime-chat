@@ -55,11 +55,13 @@ const sendMessage = async (
     const createMessage = await Message.create(message);
     console.log("🆕 Created message in DB:", createMessage);
 
-    const messageData = await Message.findById(createMessage._id)
-      .populate("sender", "_id email username image color")
-      .populate("recipient", "_id email username image color");
-
-    console.log("📄 Populated message data:", messageData);
+    const messageDoc = await Message.findById(createMessage._id)
+  .populate("sender", "_id email username image color")
+  .populate("recipient", "_id email username image color");
+  console.log("📄 Populated message data:", messageDoc);
+  
+    const messageData = messageDoc?.toObject();
+    console.log("📄 messageData", messageData);
 
     if (!messageData?.sender || !messageData?.recipient) {
       console.warn("⚠️ Missing populated sender or recipient data");
