@@ -16,8 +16,6 @@ const ChatHeader = () => {
     ? userInfo.image
     : `${NEXTJS_URL}/${userInfo?.image}`;
 
-  console.log("🟢 imageSrc: ChatHeader", imageSrc);
-
   return (
     <div className="h-[10vh] border-b-2 border-[#2f303b] flex items-center justify-between px-20">
       <div className="flex gap-5 items-center w-full justify-between ">
@@ -32,8 +30,8 @@ const ChatHeader = () => {
               <AvatarFallback
                 className={`w-full h-full flex items-center justify-center text-white font-bold text-lg`}
                 style={{
-                  backgroundColor: selectedChatData?.color
-                    ? `#${selectedChatData.color.toString(16)}`
+                  backgroundColor: userInfo?.color
+                    ? `#${userInfo.color.toString(16)}`
                     : "#808080",
                 }}
               >
