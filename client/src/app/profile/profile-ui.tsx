@@ -15,6 +15,7 @@ import {
 import { toast } from "sonner";
 import { apiClient } from "@/lib/api-client";
 import { profile } from "console";
+import { Button } from "@/components/ui/button";
 
 const presetColors = [
   0xff5733, // Red-Orange
@@ -186,10 +187,13 @@ const ProfileUI = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-black p-4">
       <div className="flex flex-col bg-gray-800 p-6 rounded-lg shadow-lg h-[80vh] w-[80vw] max-w-2xl">
-        <IoArrowBack
-          className="text-white cursor-pointer mb-6 text-3xl"
-          onClick={handleNavigate}
-        />
+        <div className="w-full h-full text-4xl bg-purple-600">
+          {" "}
+          <IoArrowBack
+            className="text-white cursor-pointer mb-6 text-3xl"
+            onClick={handleNavigate}
+          />
+        </div>
 
         <div className="flex flex-col items-center text-white space-y-4">
           {/* Avatar */}
@@ -299,15 +303,14 @@ const ProfileUI = () => {
                 />
               ))}
             </div>
+            <Button
+              disabled={isSaving}
+              onClick={handleSave}
+              className="mt-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isSaving ? "Saving..." : "Save Changes"}
+            </Button>
           </div>
-
-          <button
-            disabled={isSaving}
-            onClick={handleSave}
-            className="mt-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isSaving ? "Saving..." : "Save Changes"}
-          </button>
         </div>
       </div>
     </div>
