@@ -186,8 +186,8 @@ const ProfileUI = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-black p-4">
-      <div className="flex flex-col bg-gray-800 p-6 rounded-lg shadow-lg h-[80vh] w-[80vw] max-w-2xl relative">
-        <div className="w-full h-full text-4xl bg-purple-600">
+      <div className="flex flex-col bg-gray-800 p-6 rounded-lg shadow-lg h-[80vh] w-[80vw] max-w-2xl relative justify-center items-center">
+        <div className=" text-4xl">
           {" "}
           <IoArrowBack
             className="text-white cursor-pointer mb-6 text-3xl"
