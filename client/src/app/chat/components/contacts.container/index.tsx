@@ -69,33 +69,24 @@ const ContactsContainer = () => {
 
 const Logo = () => {
   return (
-    <div className="flex p-5  justify-start items-center gap-2">
+    <div className="flex items-center gap-2 p-5">
       <svg
-        id="logo-38"
-        width="78"
-        height="32"
-        viewBox="0 0 78 32"
+        width="40"
+        height="40"
+        viewBox="0 0 24 24"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
+        className="text-purple-600"
       >
-        {" "}
         <path
-          d="M55.5 0H77.5L58.5 32H36.5L55.5 0Z"
-          className="ccustom"
+          d="M3 5C3 3.89543 3.89543 3 5 3H19C20.1046 3 21 3.89543 21 5V15C21 16.1046 20.1046 17 19 17H7L3 21V5Z"
           fill="#8338ec"
-        ></path>{" "}
-        <path
-          d="M35.5 0H51.5L32.5 32H16.5L35.5 0Z"
-          className="ccompli1"
-          fill="#975aed"
-        ></path>{" "}
-        <path
-          d="M19.5 0H31.5L12.5 32H0.5L19.5 0Z"
-          className="ccompli2"
-          fill="#a16ee8"
-        ></path>{" "}
+        />
+        <circle cx="8" cy="10" r="1.5" fill="white" />
+        <circle cx="12" cy="10" r="1.5" fill="white" />
+        <circle cx="16" cy="10" r="1.5" fill="white" />
       </svg>
-      <span className="text-3xl font-semibold ">Syncronus</span>
+      <span className="text-3xl font-bold">chatterly</span>
     </div>
   );
 };
