@@ -22,6 +22,8 @@ const ProfileInfo = () => {
     ? userInfo.image
     : `${NEXTJS_URL}/${userInfo?.image}`;
 
+  console.log("🟢 imageSrc: userInfo ", imageSrc);
+
   const handleNavigate = () => router.push("/profile");
 
   const handleLogOut = async () => {
