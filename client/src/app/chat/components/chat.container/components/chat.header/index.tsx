@@ -1,7 +1,6 @@
 "use client";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { useAppStore } from "@/store";
 import { NEXTJS_URL } from "@/utils/constants";
 import { AvatarImage } from "@radix-ui/react-avatar";

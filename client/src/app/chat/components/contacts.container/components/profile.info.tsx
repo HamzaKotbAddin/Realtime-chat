@@ -47,7 +47,11 @@ const ProfileInfo = () => {
               />
               <AvatarFallback
                 className="w-full h-full flex items-center justify-center text-white font-bold text-lg"
-                style={{ backgroundColor: userInfo?.color }}
+                style={{
+                  backgroundColor: userInfo?.color
+                    ? `#${userInfo.color.toString(16)}`
+                    : "#808080",
+                }}
               >
                 {userInfo?.username?.charAt(0).toUpperCase()}
               </AvatarFallback>
