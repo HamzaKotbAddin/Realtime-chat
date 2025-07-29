@@ -10,12 +10,13 @@ const ChatHeader = () => {
   const closeChat = useAppStore((state) => state.closeChat);
   const selectedChatData = useAppStore((state) => state.selectedChatData);
   const SelectedChatType = useAppStore((state) => state.selectedChatType);
+  const { userInfo } = useAppStore();
 
-  const imageSrc = selectedChatData?.image?.startsWith("http")
-    ? selectedChatData.image
-    : `${NEXTJS_URL}/${selectedChatData?.image}`;
+  const imageSrc = userInfo?.image?.startsWith("http")
+    ? userInfo.image
+    : `${NEXTJS_URL}/${userInfo?.image}`;
 
-  console.log("🟢 imageSrc: selectedChatData", imageSrc);
+  console.log("🟢 imageSrc: ChatHeader", imageSrc);
 
   return (
     <div className="h-[10vh] border-b-2 border-[#2f303b] flex items-center justify-between px-20">
