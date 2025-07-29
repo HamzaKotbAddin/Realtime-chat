@@ -186,7 +186,7 @@ const ProfileUI = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-black p-4">
-      <div className="flex flex-col bg-gray-800 p-6 rounded-lg shadow-lg h-[80vh] w-[80vw] max-w-2xl">
+      <div className="flex flex-col bg-gray-800 p-6 rounded-lg shadow-lg h-[80vh] w-[80vw] max-w-2xl relative">
         <div className="w-full h-full text-4xl bg-purple-600">
           {" "}
           <IoArrowBack
@@ -195,7 +195,7 @@ const ProfileUI = () => {
           />
         </div>
 
-        <div className="flex flex-col items-center text-white space-y-4">
+        <div className="flex flex-col items-center text-white space-y-4 absolute">
           {/* Avatar */}
           <div
             className="relative"
